@@ -18,6 +18,7 @@ public class Dashboard extends javax.swing.JFrame {
      */
     public Dashboard() {
         initComponents();
+        populateTables();
     }
 
     /**
@@ -531,6 +532,32 @@ public class Dashboard extends javax.swing.JFrame {
             }
         });
     }
+private void populateTables() {
+    // 1. Fill jTable2 (Dashboard Inventory) 
+    // Columns: ID, Name, Category, Price, Quantity
+    javax.swing.table.DefaultTableModel model2 = (javax.swing.table.DefaultTableModel) jTable2.getModel();
+    model2.setRowCount(0); // Clear existing rows
+    model2.addRow(new Object[]{1, "Ergonomic Chair", "Chair", "Rs. 4,500", 12});
+    model2.addRow(new Object[]{2, "King Size Bed", "Bed", "Rs. 45,000", 5});
+    model2.addRow(new Object[]{3, "Leather Sofa", "Sofa", "Rs. 35,000", 8});
+    model2.addRow(new Object[]{4, "Wooden Cupboard", "Cupboard", "Rs. 25,000", 4});
+    model2.addRow(new Object[]{5, "Wall Rack", "Rack", "Rs. 2,500", 20});
+
+    // 2. Fill jTable3 (Furniture Stock)
+    // Columns: ID, Category, Price, In Stock
+    javax.swing.table.DefaultTableModel model3 = (javax.swing.table.DefaultTableModel) jTable3.getModel();
+    model3.setRowCount(0); // Clear existing rows
+    model3.addRow(new Object[]{101, "Chair", "Rs. 4,500", 12});
+    model3.addRow(new Object[]{102, "Bed", "Rs. 45,000", 5});
+    model3.addRow(new Object[]{103, "Sofa", "Rs. 35,000", 8});
+    model3.addRow(new Object[]{104, "Cupboard", "Rs. 25,000", 4});
+    model3.addRow(new Object[]{105, "Rack", "Rs. 2,500", 20});
+    
+    // 3. Fill jTable1 (Current Orders) - Example row
+    javax.swing.table.DefaultTableModel model1 = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+    model1.setRowCount(0);
+    model1.addRow(new Object[]{"Luxury Sofa", 1, "35,000", "5,000"});
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
