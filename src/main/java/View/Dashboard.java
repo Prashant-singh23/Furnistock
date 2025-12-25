@@ -99,7 +99,6 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(102, 0, 102));
         jLabel1.setText("FurniStock");
 
-        jTextField1.setText("Search furniture");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
