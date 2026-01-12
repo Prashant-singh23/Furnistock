@@ -6,7 +6,7 @@ package Controller;
 
 import Model.LoginModel;
 import View.LoginPage;
-import View.Dashboard;
+import View.AdminDashBoard;
 import javax.swing.JOptionPane;
 
 public class LoginController {
@@ -28,7 +28,7 @@ public class LoginController {
             JOptionPane.showMessageDialog(loginView, "Login Successful! Welcome Admin.");
             
             loginView.dispose(); // Close login
-            Dashboard dash = new Dashboard(); // Open Dashboard
+            AdminDashBoard dash = new AdminDashBoard(); // Open Dashboard
             dash.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(loginView, "Invalid Username or Password", "Login Error", JOptionPane.ERROR_MESSAGE);

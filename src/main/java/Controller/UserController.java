@@ -5,7 +5,7 @@
 package Controller;
 
 import Model.UserModel;
-import View.Dashboard;
+import View.AdminDashBoard;
 
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 public class UserController implements ActionListener {
 
     // Reference to the Dashboard view
-    private Dashboard view;
+    private AdminDashBoard view;
     
     // List to store all user records
     private ArrayList<UserModel> list;
@@ -29,7 +29,7 @@ public class UserController implements ActionListener {
     private int nextId;
 
    
-    public UserController(Dashboard view) {
+    public UserController(AdminDashBoard view) {
         this.view = view;
         this.list = new ArrayList<>();
         this.nextId = 1001; // Starting ID for users (will be prefixed with "U")

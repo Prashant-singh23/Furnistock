@@ -5,7 +5,7 @@
 package Controller;
 
 import Model.FurnitureModel;
-import View.Dashboard;
+import View.AdminDashBoard;
 
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ import javax.swing.table.DefaultTableModel;
 
 public class FurnitureController implements ActionListener {
 
-    private Dashboard view;
+    private AdminDashBoard view;
     private ArrayList<FurnitureModel> list;
     private int nextId;
 
-    public FurnitureController(Dashboard view) {
+    public FurnitureController(AdminDashBoard view) {
         this.view = view;
         this.list = new ArrayList<>();
         this.nextId = 6;
