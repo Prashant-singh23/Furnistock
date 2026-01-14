@@ -6,9 +6,19 @@ package View;
 import Controller.FurnitureController;
 import Controller.UserController;
 import Controller.LoginController;
+import Model.OrderStore;
+import Model.UserStore;
 import javax.swing.ImageIcon;
 import java.awt.Image;
 import java.awt.Graphics;
+
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import java.util.Comparator;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -16,48 +26,121 @@ import java.awt.Graphics;
  * @author MY PC
  */
 public class AdminDashBoard extends javax.swing.JFrame {
-
+    
+public static AdminDashBoard instance;
     /**
      * Creates new form AdminDashBoard
      */
-   public AdminDashBoard() {
+  public AdminDashBoard() {
     initComponents();
-    populateTables();      // REQUIRED
+    populateTables();
+    loadOrders();
+    instance = this; 
+    
+    // Initialize controllers
     new FurnitureController(this);
     new UserController(this);
-}
+    
+    // Setup all sorting functionality
+    setupFurnitureSorting();
+    setupUserSorting();
+    setupOrdersSorting();
 
+}
+  
+  
+   
+    
+    
+
+  
+  public void loadUsers() {
+    javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable4.getModel();
+    model.setRowCount(0); 
+    for (Object[] user : Model.UserStore.users) {
+        model.addRow(user);
+    }
+}
+  
+  public void loadOrders() {
+    DefaultTableModel modelPending = (DefaultTableModel) jTable1.getModel();
+    DefaultTableModel modelHistory = (DefaultTableModel) jTable5.getModel();
+    
+    modelPending.setRowCount(0); 
+    modelHistory.setRowCount(0); 
+
+    double pendingTotal = 0;
+    
+    // 1. Fill jTable1 with PENDING orders (Orders Management)
+    for (Object[] order : Model.OrderStore.orders) {
+        modelPending.addRow(order);
+        
+        // Calculate total for pending orders
+        try {
+            String priceStr = order[3].toString().toUpperCase().replace("RS.", "").replace(",", "").trim();
+            pendingTotal += Double.parseDouble(priceStr);
+        } catch (Exception e) {}
+    }
+
+    // 2. Fill jTable5 with CONFIRMED orders (Dashboard Overview)
+    for (Object[] order : Model.OrderStore.confirmedOrders) {
+        modelHistory.addRow(new Object[]{
+            order[0], // Furniture Name
+            order[1], // Category
+            order[3], // Price
+            order[2]  // Quantity
+        });
+    }
+    
+    // Update the total field
+    if (jTextField6 != null) {
+        jTextField6.setText("Rs. " + String.format("%,.0f", pendingTotal));
+    }
+}
+  
+public void loadStockToAdmin() {
+    javax.swing.table.DefaultTableModel model3 = (javax.swing.table.DefaultTableModel) jTable3.getModel();
+    model3.setRowCount(0);
+    for (Object[] item : Model.FurnitureStore.stockList) {
+        model3.addRow(item);
+    }
+}
 
 private void populateTables() {
     // 1. Fill jTable2 (Dashboard Inventory)
     javax.swing.table.DefaultTableModel model2 = (javax.swing.table.DefaultTableModel) jTable2.getModel();
     model2.setRowCount(0);
-    model2.addRow(new Object[]{1, "Ergonomic Chair", "Chair", "Rs. 4,500", 12});
-    model2.addRow(new Object[]{2, "King Size Bed", "Bed", "Rs. 45,000", 5});
-    model2.addRow(new Object[]{3, "Leather Sofa", "Sofa", "Rs. 35,000", 8});
-    model2.addRow(new Object[]{4, "Wooden Cupboard", "Cupboard", "Rs. 25,000", 4});
-    model2.addRow(new Object[]{5, "Wall Rack", "Rack", "Rs. 2,500", 20});
+    model2.addRow(new Object[]{1, "Ergonomic Chair", "Chair", "Rs. 4,500", 20});
+    model2.addRow(new Object[]{2, "King Size Bed", "Bed", "Rs. 45,000", 23});
+    model2.addRow(new Object[]{3, "Leather Sofa", "Sofa", "Rs. 35,000", 24});
+    model2.addRow(new Object[]{4, "Wooden Cupboard", "Cupboard", "Rs. 25,000", 32});
+    model2.addRow(new Object[]{5, "Wall Rack", "Rack", "Rs. 2,500", 29});
 
     // 2. Fill jTable3 (Furniture Stock)
     javax.swing.table.DefaultTableModel model3 = (javax.swing.table.DefaultTableModel) jTable3.getModel();
     model3.setRowCount(0);
-    model3.addRow(new Object[]{101, "Chair", "Rs. 4,500", 12});
-    model3.addRow(new Object[]{102, "Bed", "Rs. 45,000", 5});
-    model3.addRow(new Object[]{103, "Sofa", "Rs. 35,000", 8});
-    model3.addRow(new Object[]{104, "Cupboard", "Rs. 25,000", 4});
-    model3.addRow(new Object[]{105, "Rack", "Rs. 2,500", 20});
+    model3.addRow(new Object[]{101, "Chair", "Rs. 4,500", 20});
+    model3.addRow(new Object[]{102, "Bed", "Rs. 45,000", 23});
+    model3.addRow(new Object[]{103, "Sofa", "Rs. 35,000", 24});
+    model3.addRow(new Object[]{104, "Cupboard", "Rs. 25,000", 32});
+    model3.addRow(new Object[]{105, "Rack", "Rs. 2,500", 29});
 
     // 3. Fill jTable1 (Current Orders)
     javax.swing.table.DefaultTableModel model1 = (javax.swing.table.DefaultTableModel) jTable1.getModel();
     model1.setRowCount(0);
-    model1.addRow(new Object[]{"Leather Sofa", 1, "35,000", "5,000"});
+    loadOrders();
 
     // 4. Fill jTable4 (Users)
     javax.swing.table.DefaultTableModel model4 = (javax.swing.table.DefaultTableModel) jTable4.getModel();
     model4.setRowCount(0);
-    model4.addRow(new Object[]{1, "Ram Yadav", "ram@gmail.com", "9867456345"});
-    model4.addRow(new Object[]{2, "Ridima Khadka", "ridima@gmail.com", "9812345672"});
-     model4.addRow(new Object[]{3, "Amogh Singh", "amogh@gmail.com", "9848290200"});
+    model4.addRow(new Object[]{1, "user1", "user1gmail.com", "9867456345"});
+    model4.addRow(new Object[]{2, "user2", "user2gmail.com", "9812345672"});
+    model4.addRow(new Object[]{3, "user3", "user3gmail.com", "9848290200"});
+    model4.addRow(new Object[]{3, "user4", "user4@gmail.com", "9845672345"});
+    model4.addRow(new Object[]{3, "user5", "user5gmail.com", "9812347658"});
+    loadUsers();
+    loadOrders();
+    loadStockToAdmin();
 }
 // Furniture CRUD getters
 // FurnitureController expects THESE EXACT NAMES (keep only these):
@@ -89,6 +172,155 @@ public void clearUserFields() {
     jTextField7.setText(""); jTextField8.setText(""); jTextField9.setText(""); jTextField10.setText("");
     jComboBox1.setSelectedIndex(0); jTable4.clearSelection();
 }
+
+
+
+private void setupFurnitureSorting() {
+    // Add action listener to Sort button (jButton14)
+    jButton14.addActionListener(e -> sortFurnitureTable());
+}
+
+/**
+ * Sorts the furniture table based on selected criteria
+ */
+private void sortFurnitureTable() {
+    String sortOption = (String) jComboBox3.getSelectedItem();
+    DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    jTable2.setRowSorter(sorter);
+    
+    List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+    
+    switch (sortOption) {
+        case "Sort by ID":
+            // Sort by column 0 (ID) - numeric comparison
+            sorter.setComparator(0, Comparator.comparingInt(o -> (Integer) o));
+            sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+            break;
+            
+        case "Sort by Name":
+            // Sort by column 1 (Name) - alphabetical
+            sorter.setComparator(1, Comparator.comparing(Object::toString));
+            sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+            break;
+            
+        case "Sort by Price":
+            // Sort by column 3 (Price) - extract numeric value from "Rs. X,XXX"
+            sorter.setComparator(3, (o1, o2) -> {
+                String price1 = o1.toString().replaceAll("[^0-9]", "");
+                String price2 = o2.toString().replaceAll("[^0-9]", "");
+                return Integer.compare(
+                    Integer.parseInt(price1.isEmpty() ? "0" : price1),
+                    Integer.parseInt(price2.isEmpty() ? "0" : price2)
+                );
+            });
+            sortKeys.add(new RowSorter.SortKey(3, SortOrder.ASCENDING));
+            break;
+            
+        case "Sort by Quantity":
+            // Sort by column 4 (Quantity) - numeric comparison
+            sorter.setComparator(4, Comparator.comparingInt(o -> (Integer) o));
+            sortKeys.add(new RowSorter.SortKey(4, SortOrder.ASCENDING));
+            break;
+    }
+    
+    sorter.setSortKeys(sortKeys);
+    sorter.sort();
+}
+// ============= USER MANAGEMENT SORTING =============
+
+/**
+ * Sets up sorting functionality for the user table (jTable4)
+ * Call this method in your constructor after initComponents()
+ */
+private void setupUserSorting() {
+    // Add action listener to Sort button (jButton12)
+    jButton12.addActionListener(e -> sortUserTable());
+}
+
+/**
+ * Sorts the user table based on selected criteria
+ */
+private void sortUserTable() {
+    String sortOption = (String) jComboBox2.getSelectedItem();
+    DefaultTableModel model = (DefaultTableModel) jTable4.getModel();
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    jTable4.setRowSorter(sorter);
+    
+    List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+    
+    switch (sortOption) {
+        case "Sort by Name":
+            // Sort by column 1 (Full Name) - alphabetical
+            sorter.setComparator(1, Comparator.comparing(Object::toString));
+            sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+            break;
+            
+        case "Sort by ID":
+            // Sort by column 0 (ID) - numeric comparison
+            sorter.setComparator(0, Comparator.comparingInt(o -> (Integer) o));
+            sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+            break;
+    }
+    
+    sorter.setSortKeys(sortKeys);
+    sorter.sort();
+}
+
+// ============= ORDERS MANAGEMENT SORTING =============
+
+/**
+ * Sets up sorting functionality for the stock table (jTable3)
+ * Call this method in your constructor after initComponents()
+ */
+private void setupOrdersSorting() {
+    // Add action listener to Sort button (jButton16)
+    jButton16.addActionListener(e -> sortStockTable());
+}
+
+/**
+ * Sorts the stock/orders table based on selected criteria
+ */
+private void sortStockTable() {
+    String sortOption = (String) jComboBox4.getSelectedItem();
+    DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+    jTable3.setRowSorter(sorter);
+    
+    List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+    
+    switch (sortOption) {
+        case "Sort By ID":
+            // Sort by column 0 (ID) - numeric comparison
+            sorter.setComparator(0, Comparator.comparingInt(o -> (Integer) o));
+            sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+            break;
+            
+        case "Sort By Name":
+            // Sort by column 1 (Category/Name) - alphabetical
+            sorter.setComparator(1, Comparator.comparing(Object::toString));
+            sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+            break;
+            
+        case "Sort By Price":
+            // Sort by column 2 (Price) - extract numeric value
+            sorter.setComparator(2, (o1, o2) -> {
+                String price1 = o1.toString().replaceAll("[^0-9]", "");
+                String price2 = o2.toString().replaceAll("[^0-9]", "");
+                return Integer.compare(
+                    Integer.parseInt(price1.isEmpty() ? "0" : price1),
+                    Integer.parseInt(price2.isEmpty() ? "0" : price2)
+                );
+            });
+            sortKeys.add(new RowSorter.SortKey(2, SortOrder.ASCENDING));
+            break;
+    }
+    
+    sorter.setSortKeys(sortKeys);
+    sorter.sort();
+}
+
+
 
 
 
@@ -153,6 +385,8 @@ public void clearUserFields() {
         jComboBox3 = new javax.swing.JComboBox<>();
         jButton15 = new javax.swing.JButton();
         jTextField11 = new javax.swing.JTextField();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTable5 = new javax.swing.JTable();
         ordersManagement = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -169,6 +403,7 @@ public void clearUserFields() {
         jComboBox4 = new javax.swing.JComboBox<>();
         jButton17 = new javax.swing.JButton();
         jTextField12 = new javax.swing.JTextField();
+        jButton18 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -208,11 +443,11 @@ public void clearUserFields() {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -517,6 +752,7 @@ public void clearUserFields() {
         parentPanel.add(userManagement, "card4");
 
         DashBoard.setBackground(new java.awt.Color(255, 255, 255));
+        DashBoard.setPreferredSize(new java.awt.Dimension(1500, 900));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -550,7 +786,7 @@ public void clearUserFields() {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(311, Short.MAX_VALUE)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 935, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -722,36 +958,59 @@ public void clearUserFields() {
         jTextField11.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jTextField11.setForeground(new java.awt.Color(255, 255, 255));
 
+        jTable5.setBackground(new java.awt.Color(204, 204, 204));
+        jTable5.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Furniture Name", "Category", "Price", "Quantity"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane5.setViewportView(jTable5);
+
         javax.swing.GroupLayout DashBoardLayout = new javax.swing.GroupLayout(DashBoard);
         DashBoard.setLayout(DashBoardLayout);
         DashBoardLayout.setHorizontalGroup(
             DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(DashBoardLayout.createSequentialGroup()
+                .addGap(46, 46, 46)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(46, 46, 46)
                 .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(DashBoardLayout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41)
+                        .addComponent(jButton6)
+                        .addGap(48, 48, 48)
+                        .addComponent(jButton5))
                     .addGroup(DashBoardLayout.createSequentialGroup()
-                        .addGap(46, 46, 46)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(46, 46, 46)
-                        .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(DashBoardLayout.createSequentialGroup()
-                                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(41, 41, 41)
-                                .addComponent(jButton6)
-                                .addGap(48, 48, 48)
-                                .addComponent(jButton5))
-                            .addGroup(DashBoardLayout.createSequentialGroup()
-                                .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(71, 71, 71)
-                                .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(49, 49, 49)
-                                .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(58, 58, 58)
-                                .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(249, Short.MAX_VALUE))
+                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(71, 71, 71)
+                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(49, 49, 49)
+                        .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(58, 58, 58)
+                        .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(DashBoardLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 143, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 694, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(32, 32, 32))
         );
         DashBoardLayout.setVerticalGroup(
             DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -759,9 +1018,7 @@ public void clearUserFields() {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(61, 61, 61)
                 .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(DashBoardLayout.createSequentialGroup()
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(DashBoardLayout.createSequentialGroup()
                         .addGap(32, 32, 32)
                         .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -774,9 +1031,11 @@ public void clearUserFields() {
                             .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(175, 175, 175)))
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 328, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38))
+                        .addGap(114, 114, 114)))
+                .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(44, 44, 44))
         );
 
         parentPanel.add(DashBoard, "card2");
@@ -819,7 +1078,7 @@ public void clearUserFields() {
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(83, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -841,11 +1100,11 @@ public void clearUserFields() {
                 {null, null, null, null}
             },
             new String [] {
-                "Order Name", "Quantity", "Unit Price", "Advance Payment"
+                "Order Name", "Category", "Quantity", "Price"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -924,19 +1183,33 @@ public void clearUserFields() {
         jTextField12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jTextField12.setForeground(new java.awt.Color(255, 255, 255));
 
+        jButton18.setBackground(new java.awt.Color(0, 0, 0));
+        jButton18.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jButton18.setForeground(new java.awt.Color(255, 255, 255));
+        jButton18.setText("Refresh");
+        jButton18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton18ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout ordersManagementLayout = new javax.swing.GroupLayout(ordersManagement);
         ordersManagement.setLayout(ordersManagementLayout);
         ordersManagementLayout.setHorizontalGroup(
             ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ordersManagementLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(ordersManagementLayout.createSequentialGroup()
                 .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(ordersManagementLayout.createSequentialGroup()
-                        .addGap(782, 782, 782)
-                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(ordersManagementLayout.createSequentialGroup()
                         .addGap(71, 71, 71)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1254, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1254, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(ordersManagementLayout.createSequentialGroup()
+                        .addGap(61, 61, 61)
+                        .addComponent(jLabel10)))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(ordersManagementLayout.createSequentialGroup()
                 .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -948,46 +1221,52 @@ public void clearUserFields() {
                             .addGroup(ordersManagementLayout.createSequentialGroup()
                                 .addGap(281, 281, 281)
                                 .addComponent(jButton16, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(ordersManagementLayout.createSequentialGroup()
-                                .addGap(71, 71, 71)
-                                .addComponent(jLabel10)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(97, 97, 97)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ordersManagementLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(15, 15, 15)))
                         .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(ordersManagementLayout.createSequentialGroup()
+                                .addGap(97, 97, 97)
                                 .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(41, 41, 41)
                                 .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(45, 45, 45)
-                                .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(105, Short.MAX_VALUE))
+                                .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(ordersManagementLayout.createSequentialGroup()
+                                .addGap(61, 61, 61)
+                                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(126, 126, 126)
+                                .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         ordersManagementLayout.setVerticalGroup(
             ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ordersManagementLayout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(ordersManagementLayout.createSequentialGroup()
-                        .addGap(14, 14, 14)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 179, Short.MAX_VALUE)
+                        .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton17, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                            .addComponent(jButton16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox4)
+                            .addComponent(jTextField12))
+                        .addGap(83, 83, 83)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(19, 19, 19))
+                    .addGroup(ordersManagementLayout.createSequentialGroup()
+                        .addGap(265, 265, 265)
                         .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel10)
-                            .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 130, Short.MAX_VALUE)
-                .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton17, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
-                    .addComponent(jButton16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox4)
-                    .addComponent(jTextField12))
-                .addGap(83, 83, 83)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
+                            .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         parentPanel.add(ordersManagement, "card3");
@@ -1006,7 +1285,7 @@ public void clearUserFields() {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(parentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 898, Short.MAX_VALUE)
+            .addComponent(parentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -1046,15 +1325,37 @@ public void clearUserFields() {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
-        // TODO add your handling code here:
+          
     }//GEN-LAST:event_jTextField6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
+       int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow >= 0) {
+        // 1. Get the order data before removing it
+        Object[] rowData = Model.OrderStore.orders.get(selectedRow);
+        
+        // 2. Move it to the Confirmed list
+        Model.OrderStore.confirmedOrders.add(rowData);
+        
+        // 3. Remove from the Pending list
+        Model.OrderStore.orders.remove(selectedRow);
+        
+        // 4. Refresh both tables
+        loadOrders();  
+        
+        javax.swing.JOptionPane.showMessageDialog(this, "Order Confirmed and moved to Dashboard History!");
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select an order from the table first.");
+    }
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // TODO add your handling code here:
+       int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow >= 0) {
+        OrderStore.orders.remove(selectedRow);
+        loadOrders();
+        javax.swing.JOptionPane.showMessageDialog(this, "Order cancelled!");
+    }
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
@@ -1088,6 +1389,13 @@ public void clearUserFields() {
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
+       
+    loadOrders();
+    javax.swing.JOptionPane.showMessageDialog(this, "Orders refreshed from UserDashboard!");
+
+    }//GEN-LAST:event_jButton18ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1135,6 +1443,7 @@ public void clearUserFields() {
     private javax.swing.JButton jButton15;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
+    private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -1174,10 +1483,12 @@ public void clearUserFields() {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
     private javax.swing.JTable jTable4;
+    private javax.swing.JTable jTable5;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
     private javax.swing.JTextField jTextField11;

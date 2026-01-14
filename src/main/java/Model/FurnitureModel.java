@@ -55,18 +55,23 @@ public class FurnitureModel {
         return category;
     }
     
-    
+    // Add these methods:
     public String getPrice() {
-        return price;
-    }
+    return price;
+}
+
+
     
    
     public int getQuantity() {
         return quantity;
     }
     
-    //  SETTERS 
-   
+    //  SETTERS
+    
+    public void setId(int id) {
+    this.id = id;
+}
     public void setName(String name) {
         this.name = name;
     }
@@ -76,10 +81,9 @@ public class FurnitureModel {
         this.category = category;
     }
     
-   
-    public void setPrice(String price) {
-        this.price = price;
-    }
+   public void setPrice(String price) {
+    this.price = price;
+}
     
     
     public void setQuantity(int quantity) {

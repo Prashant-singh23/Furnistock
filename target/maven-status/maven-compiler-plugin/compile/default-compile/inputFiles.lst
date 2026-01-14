@@ -3,8 +3,11 @@ C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Controller\FurnitureCon
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Controller\LoginController.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Controller\UserController.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Model\FurnitureModel.java
+C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Model\FurnitureStore.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Model\LoginModel.java
+C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Model\OrderStore.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Model\UserModel.java
+C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\Model\UserStore.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\View\AdminDashBoard.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\View\LoginPage.java
 C:\Users\MY PC\OneDrive\Desktop\FurniStock\src\main\java\View\StartPage.java
