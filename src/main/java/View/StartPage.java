@@ -221,36 +221,49 @@ public class StartPage extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel4MouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-  String enteredName = jTextField2.getText();
-    String enteredPassword = new String(jPasswordField1.getPassword());
-    
-    int userIndex = -1; // Use this to store the position of the user found
+  // Retrieve username input from the text field
+String enteredName = jTextField2.getText();
 
-    // 1. Loop to find the user
-    for (int i = 0; i < usernames.length; i++) {
-        if (enteredName.equals(usernames[i]) && enteredPassword.equals(passwords[i])) {
-            userIndex = i; // Save the index to use later
-            break;
-        }
+// Retrieve password input from the password field
+// Note: JPasswordField.getPassword() returns a char array, which is converted to a String
+String enteredPassword = new String(jPasswordField1.getPassword());
+
+// Initialize a variable to store the index of the authenticated user
+// -1 means no matching user has been found yet
+int userIndex = -1;
+
+// 1. Loop through the stored usernames to check credentials
+for (int i = 0; i < usernames.length; i++) {
+    // Compare entered credentials with stored usernames and passwords
+    if (enteredName.equals(usernames[i]) && enteredPassword.equals(passwords[i])) {
+        userIndex = i; // Save the index of the matching user
+        break;         // Exit the loop early since a match is found
     }
+}
 
-    // 2. Check if userIndex was changed from -1 (meaning login found)
-    if (userIndex != -1) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Login Successful!");
+// 2. Check whether a matching user was found
+if (userIndex != -1) {
+    // Login successful
+    javax.swing.JOptionPane.showMessageDialog(this, "Login Successful!");
 
-        // Use 'userIndex' to get the data from your arrays
-        String name = fullNames[userIndex];
-        String email = emails[userIndex];
-        String contact = contacts[userIndex];
+    // Retrieve the full user details using the saved index
+    String name = fullNames[userIndex];
+    String email = emails[userIndex];
+    String contact = contacts[userIndex];
 
-        // Pass these to UserDashboard
-        UserDashboard dashboard = new UserDashboard(enteredName, name, email, contact);
-        dashboard.setVisible(true);
-        this.dispose();
+    // Pass user details to the UserDashboard constructor
+    // This allows the dashboard to display personalized information
+    UserDashboard dashboard = new UserDashboard(enteredName, name, email, contact);
+    dashboard.setVisible(true); // Show the User Dashboard
 
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Invalid Username or Password");
-    }
+    // Close the login window to prevent duplicate windows
+    this.dispose();
+
+} else {
+    // No matching user was found; display an error message
+    javax.swing.JOptionPane.showMessageDialog(this, "Invalid Username or Password");
+}
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

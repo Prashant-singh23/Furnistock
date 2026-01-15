@@ -289,71 +289,109 @@ public class UserLoginPage1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-      // 1. Get data from fields
-    String name = jTextField1.getText().trim();
-    String username = jTextField2.getText().trim();
-    String password = new String(jPasswordField1.getPassword());
-    String confirmPass = new String(jPasswordField2.getPassword());
-    String contact = jTextField4.getText().trim();
-    String email = jTextField5.getText().trim();
+     // 1. RETRIEVE DATA FROM INPUT FIELDS
+// Trim removes accidental spaces before/after the input
+String name = jTextField1.getText().trim();
+String username = jTextField2.getText().trim();
+String password = new String(jPasswordField1.getPassword());
+String confirmPass = new String(jPasswordField2.getPassword());
+String contact = jTextField4.getText().trim();
+String email = jTextField5.getText().trim();
 
-    // --- 2. VALIDATION LOGIC ---
+// --- 2. VALIDATION LOGIC ---
 
-    // Check if any field is empty
-    if (name.isEmpty() || username.isEmpty() || contact.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPass.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "All fields are required!", "Validation Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+// Check if any field is empty
+if (name.isEmpty() || username.isEmpty() || contact.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPass.isEmpty()) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "All fields are required!",
+        "Validation Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+    return; // Stop processing if validation fails
+}
 
-    // Name Validation (Letters and spaces only)
-    if (!name.matches("^[a-zA-Z\\s]+$")) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Name can only contain letters and spaces.", "Validation Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-
-    // Password Length Validation (Min 6 characters)
-    if (password.length() < 6) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Password must be at least 6 characters long.", "Validation Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    // Password Match Validation
-    if (!password.equals(confirmPass)) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match!", "Validation Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    // Contact Number Validation (Exactly 10 digits)
-   if (!contact.matches("\\d{10}")) {
-    javax.swing.JOptionPane.showMessageDialog(this, "Contact Number must be exactly 10 digits.", "Validation Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+// Name Validation: Only letters and spaces are allowed
+if (!name.matches("^[a-zA-Z\\s]+$")) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Name can only contain letters and spaces.",
+        "Validation Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE
+    );
     return;
 }
 
-    // --- 3. DATA PROCESSING (If all validations pass) ---
+// Password Length Validation: Minimum 6 characters
+if (password.length() < 6) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Password must be at least 6 characters long.",
+        "Validation Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+    return;
+}
 
-    try {
-        // Save User to the shared Store
-        int newId = Model.UserStore.generateId();
-        Object[] newUser = {newId, name, email, contact};
-        Model.UserStore.users.add(newUser);
+// Password Match Validation: Ensure password and confirmation match
+if (!password.equals(confirmPass)) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Passwords do not match!",
+        "Validation Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+    return;
+}
 
-        // Update Admin Table if open
-        if (AdminDashBoard.instance != null) {
-            AdminDashBoard.instance.loadUsers();
-        }
+// Contact Number Validation: Must be exactly 10 digits
+if (!contact.matches("\\d{10}")) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Contact Number must be exactly 10 digits.",
+        "Validation Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+    return;
+}
 
-        // Success message
-        javax.swing.JOptionPane.showMessageDialog(this, "Registration Successful! Your ID is: " + newId);
+// --- 3. DATA PROCESSING (If all validations pass) ---
+try {
+    // Generate a new unique ID for the user
+    int newId = Model.UserStore.generateId();
 
-        // Navigate to User Dashboard
-        UserDashboard dashboard = new UserDashboard(String.valueOf(newId), name, email, contact);
-        dashboard.setVisible(true);
-        this.dispose();
+    // Store user information in a shared static user store
+    Object[] newUser = {newId, name, email, contact};
+    Model.UserStore.users.add(newUser);
 
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Error saving user: " + e.getMessage(), "System Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    // Refresh Admin Dashboard user table if it is open
+    if (AdminDashBoard.instance != null) {
+        AdminDashBoard.instance.loadUsers();
     }
+
+    // Show success message with generated user ID
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Registration Successful! Your ID is: " + newId
+    );
+
+    // Open the User Dashboard with user details
+    UserDashboard dashboard = new UserDashboard(String.valueOf(newId), name, email, contact);
+    dashboard.setVisible(true);
+
+    // Close the registration/login form
+    this.dispose();
+
+} catch (Exception e) {
+    // Handle any unexpected errors during registration
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Error saving user: " + e.getMessage(),
+        "System Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+}
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed

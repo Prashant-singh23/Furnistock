@@ -196,26 +196,38 @@ public class LoginPage extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    String enteredName = jTextField1.getText(); // Changed from jTextField2 to jTextField1
-    String enteredPassword = new String(jPasswordField1.getPassword());
+    // Retrieve the text entered by the user in the username field
+String enteredName = jTextField1.getText(); // Corrected field reference to jTextField1
 
-    // Check for Admin Credentials
-    if (enteredName.equals("@prashant") && enteredPassword.equals("12345")) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Admin Login Successful!");
-        
-        // Navigate to Admin Dashboard
-        new AdminDashBoard().setVisible(true);
-        
-        // Close the login page
-        this.dispose(); 
-    } else {
-        // Optional: Keep your existing user loop here if you want normal users to log in too
-        // Otherwise, just show an error message
-        javax.swing.JOptionPane.showMessageDialog(this,
-                "Invalid Admin Username or Password",
-                "Login Failed",
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
+// Retrieve the password entered by the user.
+// Note: JPasswordField.getPassword() returns a char array, so we convert it to a String
+String enteredPassword = new String(jPasswordField1.getPassword());
+
+// Validate Admin credentials
+if (enteredName.equals("@prashant") && enteredPassword.equals("12345")) {
+    // Display a success message to the user
+    javax.swing.JOptionPane.showMessageDialog(this, "Admin Login Successful!");
+    
+    // Navigate to the Admin Dashboard
+    // Creates a new AdminDashBoard instance and makes it visible
+    new AdminDashBoard().setVisible(true);
+    
+    // Close the current login window to prevent duplicate windows
+    this.dispose(); 
+} else {
+    // If the credentials do not match the admin account
+    // Display an error message indicating failed login
+    javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "Invalid Admin Username or Password", // Message to display
+            "Login Failed",                       // Title of the message box
+            javax.swing.JOptionPane.ERROR_MESSAGE // Icon type
+    );
+    
+    // Optional: You could include additional logic here for normal users
+    // such as iterating through a user list or database to validate non-admin logins.
+}
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

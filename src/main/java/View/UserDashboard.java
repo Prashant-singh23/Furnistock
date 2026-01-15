@@ -23,10 +23,10 @@ public static UserDashboard instance;
      * Creates new form UserDashboard
      */
 public UserDashboard(String user, String fullName, String email, String contact) {
-    instance = this; // SET THIS FIRST
+    instance = this; 
     initComponents(); 
     
-    // Load data immediately on startup
+  
     loadStockFromAdmin();
     refreshOrderTable();
     calculateAndSetPrice();
@@ -1327,9 +1327,7 @@ public void loadStockFromAdmin() {
     model.setRowCount(0); 
 
     for (Object[] item : Model.FurnitureStore.stockList) {
-        // Only add if data is complete (5 items)
-        if (item.length >= 5) {
-            // User Table: ID(0), Category(2), Price(3), In Stock(4)
+        if (item.length >= 5) {        
             Object[] rowForUser = {item[0], item[2], item[3], item[4]};
             model.addRow(rowForUser);
         }
@@ -1393,7 +1391,6 @@ public void loadStockFromAdmin() {
     jTextField2.setText(productName);
     
     // 3. Set the Category in the ComboBox
-    // This assumes the category string matches exactly with "Chair", "Sofa", or "Rack" in your JComboBox model
     jComboBox1.setSelectedItem(category);
     
     // 4. Trigger the price calculation logic you already have
@@ -1499,7 +1496,7 @@ private void clearProfileFields() {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-    AdminDashBoard.instance = null; // Clear the reference since we are closing
+    AdminDashBoard.instance = null; 
     new View.LoginPage().setVisible(true);
     this.dispose();
     }//GEN-LAST:event_jButton5ActionPerformed
@@ -1552,10 +1549,10 @@ private void clearProfileFields() {
     parentPanel.revalidate();
     
     // Optional: Reset the fields to default if you want a clean start
-    jTextField2.setText("");           // Clear Furniture Name
-    jComboBox1.setSelectedIndex(0);    // Set Category to "None"
-    jComboBox2.setSelectedIndex(0);    // Set Quantity to 0
-    jTextField1.setText("Rs. 0");      // Reset Price display
+    jTextField2.setText("");           
+    jComboBox1.setSelectedIndex(0);    
+    jComboBox2.setSelectedIndex(0);    
+    jTextField1.setText("Rs. 0");     
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
