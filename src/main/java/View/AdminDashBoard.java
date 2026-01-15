@@ -38,8 +38,8 @@ public static AdminDashBoard instance;
     instance = this; 
     
     // Initialize controllers
-    new FurnitureController(this);
-    new UserController(this);
+  new FurnitureController(this);
+   new UserController(this);
     
     // Setup all sorting functionality
     setupFurnitureSorting();
@@ -349,49 +349,70 @@ private void highlightAndLoadFurniture(int index) {
     }
 }
   
-public void loadStockToAdmin() {
-    javax.swing.table.DefaultTableModel model3 = (javax.swing.table.DefaultTableModel) jTable3.getModel();
-    model3.setRowCount(0);
+public void loadStockFromAdmin() {
+    javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+    model.setRowCount(0); 
+    
     for (Object[] item : Model.FurnitureStore.stockList) {
-        model3.addRow(item);
+        // User table typically expects: ID, Category, Price, Stock
+        // Index 0: ID, Index 2: Category, Index 3: Price, Index 4: Qty
+        Object[] rowForUser = {item[0], item[2], item[3], item[4]};
+        model.addRow(rowForUser);
     }
 }
 
 private void populateTables() {
-    // 1. Fill jTable2 (Dashboard Inventory)
-    javax.swing.table.DefaultTableModel model2 = (javax.swing.table.DefaultTableModel) jTable2.getModel();
-    model2.setRowCount(0);
-    model2.addRow(new Object[]{1, "Ergonomic Chair", "Chair", "Rs. 4,500", 20});
-    model2.addRow(new Object[]{2, "King Size Bed", "Bed", "Rs. 45,000", 23});
-    model2.addRow(new Object[]{3, "Leather Sofa", "Sofa", "Rs. 35,000", 24});
-    model2.addRow(new Object[]{4, "Wooden Cupboard", "Cupboard", "Rs. 25,000", 32});
-    model2.addRow(new Object[]{5, "Wall Rack", "Rack", "Rs. 2,500", 29});
+      if (Model.FurnitureStore.stockList.isEmpty()) {
+        Model.FurnitureStore.stockList.add(new Object[]{1, "Ergonomic Chair", "Chair", "Rs. 4,500", 12});
+        Model.FurnitureStore.stockList.add(new Object[]{2, "King Size Bed", "Bed", "Rs. 45,000", 5});
+        Model.FurnitureStore.stockList.add(new Object[]{3, "Leather Sofa", "Sofa", "Rs. 35,000", 8});
+        Model.FurnitureStore.stockList.add(new Object[]{4, "Wooden Cupboard", "Cupboard", "Rs. 25,000", 4});
+        Model.FurnitureStore.stockList.add(new Object[]{5, "Wall Rack", "Rack", "Rs. 2,500", 20});
+    }
+    if (Model.UserStore.users.isEmpty()) {
+    Model.UserStore.users.add(new Object[]{1, "user1", "user1@gmail.com", "9867456345"});
+    Model.UserStore.users.add(new Object[]{2, "user2", "user2@gmail.com", "9812345672"});
+    Model.UserStore.users.add(new Object[]{3, "user3", "user3@gmail.com", "9848290200"});
+    Model.UserStore.users.add(new Object[]{4, "user4", "user4@gmail.com", "9845672345"});
+    Model.UserStore.users.add(new Object[]{5, "user5", "user5@gmail.com", "9812347658"});
 
-    // 2. Fill jTable3 (Furniture Stock)
-    javax.swing.table.DefaultTableModel model3 = (javax.swing.table.DefaultTableModel) jTable3.getModel();
-    model3.setRowCount(0);
-    model3.addRow(new Object[]{101, "Chair", "Rs. 4,500", 20});
-    model3.addRow(new Object[]{102, "Bed", "Rs. 45,000", 23});
-    model3.addRow(new Object[]{103, "Sofa", "Rs. 35,000", 24});
-    model3.addRow(new Object[]{104, "Cupboard", "Rs. 25,000", 32});
-    model3.addRow(new Object[]{105, "Rack", "Rs. 2,500", 29});
+}
 
-    // 3. Fill jTable1 (Current Orders)
-    javax.swing.table.DefaultTableModel model1 = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-    model1.setRowCount(0);
+    // === 3. SYNC ALL TABLES ===
+    // This will load the furniture into jTable2, jTable3, AND the User Dashboard
+    refreshAdminTables(); 
+    
+    // These load data from their respective static lists (Model)
+    loadUsers(); 
     loadOrders();
+}
 
-    // 4. Fill jTable4 (Users)
-    javax.swing.table.DefaultTableModel model4 = (javax.swing.table.DefaultTableModel) jTable4.getModel();
-    model4.setRowCount(0);
-    model4.addRow(new Object[]{1, "user1", "user1gmail.com", "9867456345"});
-    model4.addRow(new Object[]{2, "user2", "user2gmail.com", "9812345672"});
-    model4.addRow(new Object[]{3, "user3", "user3gmail.com", "9848290200"});
-    model4.addRow(new Object[]{3, "user4", "user4@gmail.com", "9845672345"});
-    model4.addRow(new Object[]{3, "user5", "user5gmail.com", "9812347658"});
-    loadUsers();
-    loadOrders();
-    loadStockToAdmin();
+public void refreshAdminTables() {
+    DefaultTableModel invModel = (DefaultTableModel) jTable2.getModel();   // 5 Columns
+    DefaultTableModel stockModel = (DefaultTableModel) jTable3.getModel(); // 4 Columns
+    
+    invModel.setRowCount(0);
+    stockModel.setRowCount(0);
+    
+    for (Object[] item : Model.FurnitureStore.stockList) {
+        // SAFETY CHECK: If the array doesn't have 5 items, skip it to prevent crash
+        if (item.length < 5) {
+            System.out.println("Skipping invalid data: " + java.util.Arrays.toString(item));
+            continue; 
+        }
+
+        // Table 2: ID, Name, Category, Price, Qty
+        invModel.addRow(item);   
+
+        // Table 3: ID(0), Category(2), Price(3), Qty(4)
+        Object[] stockRow = {item[0], item[2], item[3], item[4]};
+        stockModel.addRow(stockRow); 
+    }
+
+    // Update User side
+    if (UserDashboard.instance != null) {
+        UserDashboard.instance.loadStockFromAdmin();
+    }
 }
 // Furniture CRUD getters
 // FurnitureController expects THESE EXACT NAMES (keep only these):
@@ -614,6 +635,7 @@ private void sortStockTable() {
         jScrollPane5 = new javax.swing.JScrollPane();
         jTable5 = new javax.swing.JTable();
         jComboBox5 = new javax.swing.JComboBox<>();
+        jButton19 = new javax.swing.JButton();
         ordersManagement = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -958,6 +980,16 @@ private void sortStockTable() {
         jComboBox5.setForeground(new java.awt.Color(255, 255, 255));
         jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Search By ID", "Search By Name" }));
 
+        jButton19.setBackground(new java.awt.Color(0, 0, 0));
+        jButton19.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jButton19.setForeground(new java.awt.Color(255, 255, 255));
+        jButton19.setText("USER");
+        jButton19.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton19ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout DashBoardLayout = new javax.swing.GroupLayout(DashBoard);
         DashBoard.setLayout(DashBoardLayout);
         DashBoardLayout.setHorizontalGroup(
@@ -990,16 +1022,23 @@ private void sortStockTable() {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(DashBoardLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 694, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32))
+                .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(DashBoardLayout.createSequentialGroup()
+                        .addComponent(jButton19, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(DashBoardLayout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 617, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 694, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(32, 32, 32))))
         );
         DashBoardLayout.setVerticalGroup(
             DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(DashBoardLayout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61)
+                .addGap(32, 32, 32)
+                .addComponent(jButton19)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(DashBoardLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(DashBoardLayout.createSequentialGroup()
@@ -1016,7 +1055,7 @@ private void sortStockTable() {
                                     .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(DashBoardLayout.createSequentialGroup()
                                 .addGap(127, 127, 127)
-                                .addComponent(jComboBox5, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)))
+                                .addComponent(jComboBox5)))
                         .addGap(53, 53, 53)
                         .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)))
@@ -1262,7 +1301,7 @@ private void sortStockTable() {
                             .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jComboBox7, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                         .addGroup(ordersManagementLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButton16, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1572,7 +1611,7 @@ private void sortStockTable() {
                         .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         parentPanel.add(userManagement, "card4");
@@ -1681,7 +1720,27 @@ private void sortStockTable() {
     }//GEN-LAST:event_jTextField9ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+
+        // Generate ID
+        int id = Model.FurnitureStore.stockList.size() + 1;
+        String name = jTextField2.getText().trim();
+        String cat = jTextField3.getText().trim();
+        String price = jTextField4.getText().trim();
+        int qty = Integer.parseInt(jTextField5.getText().trim());
+
+        // Create 5-element array (Standard format)
+        Object[] newFurniture = {id, name, cat, price, qty};
+        
+        // Add to global shared list
+        Model.FurnitureStore.stockList.add(newFurniture);
+
+        // Update local Admin tables AND the User table
+        refreshAdminTables(); 
+        
+        clearFields();
+        javax.swing.JOptionPane.showMessageDialog(this, "Furniture synchronized across all panels!");
+        
+   
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
@@ -1710,6 +1769,12 @@ private void sortStockTable() {
     private void jComboBox7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox7ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox7ActionPerformed
+
+    private void jButton19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton19ActionPerformed
+     AdminDashBoard.instance = null; // Clear the reference since we are closing
+    new View.StartPage().setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_jButton19ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1758,6 +1823,7 @@ private void sortStockTable() {
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
+    private javax.swing.JButton jButton19;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;

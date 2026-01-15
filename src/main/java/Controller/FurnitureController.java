@@ -6,6 +6,7 @@ package Controller;
 
 import Model.FurnitureModel;
 import View.AdminDashBoard;
+import View.UserDashboard;
 
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class FurnitureController implements ActionListener {
 
         loadInitialData();
 
+        // Add action listeners only once
         view.getBtnAdd().addActionListener(this);
         view.getBtnUpdate().addActionListener(this);
         view.getBtnDelete().addActionListener(this);
@@ -49,7 +51,8 @@ public class FurnitureController implements ActionListener {
         refreshAllTables();
     }
 
-    //  ACTION HANDLER 
+
+   //  ACTION HANDLER 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == view.getBtnAdd()) {
@@ -203,6 +206,8 @@ public class FurnitureController implements ActionListener {
     private void refreshAllTables() {
         refreshDashboardTable();
         refreshStockTable();
+        syncWithGlobalStore();
+        refreshUserDashboard(); // NEW: Refresh User Dashboard
     }
 
     private void refreshDashboardTable() {
@@ -233,6 +238,29 @@ public class FurnitureController implements ActionListener {
                 f.getPrice(),
                 f.getQuantity()
             });
+        }
+    }
+
+    // NEW METHOD: Sync with the global FurnitureStore
+    private void syncWithGlobalStore() {
+        Model.FurnitureStore.stockList.clear();
+        
+        for (FurnitureModel f : list) {
+            Object[] item = {
+                f.getId(),
+                f.getName(),
+                f.getCategory(),
+                f.getPrice(),
+                f.getQuantity()
+            };
+            Model.FurnitureStore.stockList.add(item);
+        }
+    }
+
+    // NEW METHOD: Refresh User Dashboard if it exists
+    private void refreshUserDashboard() {
+        if (UserDashboard.instance != null) {
+            UserDashboard.instance.loadStockFromAdmin();
         }
     }
 }
