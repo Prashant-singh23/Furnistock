@@ -46,16 +46,22 @@ public class UserDao {
             if (rs.next()) {
                 String storedHash = rs.getString("password_hash");
 
-                if (BCrypt.checkpw(password, storedHash)) {
-                    User user = new User();
+                // Fallback: If storedHash is not a BCrypt hash, check plain text
+                boolean valid = false;
+                if (storedHash != null && storedHash.startsWith("$2a$") || storedHash.startsWith("$2b$") || storedHash.startsWith("$2y$")) {
+                    valid = org.mindrot.jbcrypt.BCrypt.checkpw(password, storedHash);
+                } else {
+                    valid = password.equals(storedHash);
+                }
 
+                if (valid) {
+                    User user = new User();
                     user.setId(rs.getInt("id"));
                     user.setFirstName(rs.getString("first_name"));
                     user.setLastName(rs.getString("last_name"));
                     user.setEmail(rs.getString("email"));
                     user.setPhoneNumber(rs.getString("phone_number"));
                     user.setPasswordHash(storedHash);
-
                     return user;
                 }
             }

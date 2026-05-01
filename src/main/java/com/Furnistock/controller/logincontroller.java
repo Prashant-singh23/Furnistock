@@ -8,7 +8,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet({"/login", "/register", "/home", "/logout"})
-public class logincontroller extends HttpServlet {
+public class LoginController extends HttpServlet {
     private final UserDao userDao = new UserDao();
 
     @Override
