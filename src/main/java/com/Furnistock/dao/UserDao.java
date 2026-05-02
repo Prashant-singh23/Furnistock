@@ -72,4 +72,25 @@ public class UserDao {
 
         return null;
     }
+
+    // Admin login with hardcoded credentials
+    public User validateAdmin(String username, String password) {
+        // Hardcoded admin credentials
+        String adminUsername = "admin";
+        String adminPassword = "Admin@123";
+
+        if (username.equals(adminUsername) && password.equals(adminPassword)) {
+            User admin = new User();
+            admin.setId(0);
+            admin.setFirstName("Admin");
+            admin.setLastName("User");
+            admin.setEmail("admin@furnistock.com");
+            admin.setPhoneNumber("9999999999");
+            admin.setPasswordHash(adminPassword);
+            admin.setRole("admin");
+            return admin;
+        }
+
+        return null;
+    }
 }

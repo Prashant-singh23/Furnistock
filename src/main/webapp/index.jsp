@@ -29,6 +29,7 @@
             <a href="contact.jsp">Contact</a>
         </div>
         <div class="nav-auth">
+            <a href="${pageContext.request.contextPath}/admin-login" class="btn-login" style="background-color: #e74c3c;">Admin</a>
             <a href="${pageContext.request.contextPath}/login" class="btn-login">Sign In</a>
             <a href="${pageContext.request.contextPath}/register" class="btn-register">Get Started</a>
         </div>

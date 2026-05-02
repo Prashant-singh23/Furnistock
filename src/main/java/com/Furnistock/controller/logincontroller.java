@@ -7,7 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-@WebServlet({"/login", "/register", "/home", "/logout"})
+@WebServlet({"/login", "/register", "/home", "/logout", "/admin", "/admin-login"})
 public class LoginController extends HttpServlet {
     private final UserDao userDao = new UserDao();
 
@@ -19,6 +19,8 @@ public class LoginController extends HttpServlet {
 
         if ("/login".equals(path)) {
             request.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(request, response);
+        } else if ("/admin-login".equals(path)) {
+            request.getRequestDispatcher("/WEB-INF/pages/admin-login.jsp").forward(request, response);
         } else if ("/register".equals(path)) {
             request.getRequestDispatcher("/WEB-INF/pages/register.jsp").forward(request, response);
         } else if ("/home".equals(path)) {
@@ -27,6 +29,21 @@ public class LoginController extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/pages/home.jsp").forward(request, response);
             } else {
                 response.sendRedirect(request.getContextPath() + "/login");
+            }
+        } else if ("/admin".equals(path)) {
+            HttpSession session = request.getSession(false);
+            if (session != null && session.getAttribute("user") != null) {
+                Object userObj = session.getAttribute("user");
+                if (userObj instanceof User) {
+                    User user = (User) userObj;
+                    if ("admin".equals(user.getRole())) {
+                        request.getRequestDispatcher("/WEB-INF/pages/admin.jsp").forward(request, response);
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/home");
+                    }
+                }
+            } else {
+                response.sendRedirect(request.getContextPath() + "/admin-login");
             }
         } else if ("/logout".equals(path)) {
             HttpSession session = request.getSession(false);
@@ -47,6 +64,8 @@ public class LoginController extends HttpServlet {
 
         if ("/login".equals(path)) {
             handleLogin(request, response);
+        } else if ("/admin-login".equals(path)) {
+            handleAdminLogin(request, response);
         } else if ("/register".equals(path)) {
             handleRegister(request, response);
         } else {
@@ -71,10 +90,39 @@ public class LoginController extends HttpServlet {
         if (user != null) {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-            response.sendRedirect(request.getContextPath() + "/home");
+            // Check if user is admin
+            if ("admin".equals(user.getRole())) {
+                response.sendRedirect(request.getContextPath() + "/admin");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
         } else {
             request.setAttribute("error", "Invalid email or password.");
             request.getRequestDispatcher("/WEB-INF/pages/login.jsp").forward(request, response);
+        }
+    }
+
+    private void handleAdminLogin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        if (username == null || password == null || username.isBlank() || password.isBlank()) {
+            request.setAttribute("error", "Username and password are required.");
+            request.getRequestDispatcher("/WEB-INF/pages/admin-login.jsp").forward(request, response);
+            return;
+        }
+
+        User admin = userDao.validateAdmin(username, password);
+
+        if (admin != null) {
+            HttpSession session = request.getSession();
+            session.setAttribute("user", admin);
+            response.sendRedirect(request.getContextPath() + "/admin");
+        } else {
+            request.setAttribute("error", "Invalid username or password.");
+            request.getRequestDispatcher("/WEB-INF/pages/admin-login.jsp").forward(request, response);
         }
     }
 

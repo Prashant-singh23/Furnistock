@@ -104,6 +104,14 @@
                 <a href="Register">Create one — it's free</a>
             </p>
 
+            <!-- Admin Login Link -->
+            <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #999; margin-bottom: 8px;">Are you an admin?</p>
+                <a href="${pageContext.request.contextPath}/admin-login" style="color: #e74c3c; text-decoration: none; font-weight: 600;">
+                    Go to Admin Login →
+                </a>
+            </div>
+
         </div>
         <!-- /card-body -->
 

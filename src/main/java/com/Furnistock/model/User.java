@@ -1,12 +1,16 @@
 package com.Furnistock.model;
 
 public class User {
+	 public static final String ROLE_USER = "user";
+	 public static final String ROLE_ADMIN = "admin";
+	 
 	 private int id;
 	 private String firstName;
 	 private String lastName;
 	 private String email;
 	 private String phoneNumber;
 	 private String passwordHash;
+	 private String role = ROLE_USER;
 	 
 	 public User()
 	 {
@@ -20,6 +24,18 @@ public class User {
 		this.email = email;
 		this.phoneNumber = phoneNumber;
 		this.passwordHash = passwordHash;
+		this.role = ROLE_USER;
+	}
+	 
+	 public User(int id, String firstName, String lastName, String email, String phoneNumber, String passwordHash, String role) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phoneNumber = phoneNumber;
+		this.passwordHash = passwordHash;
+		this.role = role;
 	}
 	 public int getId() {
 		 return id;
@@ -57,5 +73,11 @@ public class User {
 	 public void setPasswordHash(String passwordHash) {
 		 this.passwordHash = passwordHash;
 	 }
+	 public String getRole() {
+		return role;
+	}
+	 public void setRole(String role) {
+		this.role = role;
+	}
 
 }
