@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard — FurniStock</title>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/home.css">
+    <link rel="stylesheet" type="text/css" href="css/home.css">
     <style>
         * {
             margin: 0;
@@ -233,19 +233,19 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Customers</h3>
-                <div class="stat-number">150+</div>
+                <div class="stat-number"><%= request.getAttribute("totalUsers") != null ? request.getAttribute("totalUsers") : 0 %></div>
             </div>
             <div class="stat-card">
                 <h3>Total Orders</h3>
-                <div class="stat-number">320+</div>
+                <div class="stat-number"><%= request.getAttribute("totalOrders") != null ? request.getAttribute("totalOrders") : 0 %></div>
             </div>
             <div class="stat-card">
                 <h3>Product Listings</h3>
-                <div class="stat-number">500+</div>
+                <div class="stat-number"><%= request.getAttribute("totalProducts") != null ? request.getAttribute("totalProducts") : 0 %></div>
             </div>
             <div class="stat-card">
-                <h3>Monthly Revenue</h3>
-                <div class="stat-number">$45K+</div>
+                <h3>Total Revenue</h3>
+                <div class="stat-number">$<%= String.format("%.2f", request.getAttribute("totalRevenue") != null ? request.getAttribute("totalRevenue") : 0.0) %></div>
             </div>
         </div>
 
@@ -261,19 +261,12 @@
             <div class="feature-card">
                 <div class="feature-icon">👥</div>
                 <h3>Manage Customers</h3>
-                <p>View customer details, order history, and manage customer accounts and subscriptions.</p>
-                <a href="#">View Customers</a>
+                <p>View and manage customer accounts, contact information, and account details.</p>
+                <a href="${pageContext.request.contextPath}/customer-list">View Customers</a>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">📋</div>
-                <h3>View Orders</h3>
-                <p>Monitor all orders, track shipments, and manage order statuses and fulfillment.</p>
-                <a href="#">View Orders</a>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
+                <div class="feature-icon">📊</div>
                 <h3>View Reports</h3>
                 <p>Analyze sales data, revenue trends, and generate comprehensive business reports.</p>
                 <a href="#">View Reports</a>

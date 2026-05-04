@@ -6,6 +6,8 @@ import com.Furnistock.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDao {
 
@@ -92,5 +94,66 @@ public class UserDao {
         }
 
         return null;
+    }
+
+    // Get total number of registered users
+    public int getUserCount() {
+        String query = "SELECT COUNT(*) as count FROM users";
+
+        try (Connection conn = dbconfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting user count: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    // Get all customers/users
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT id, first_name, last_name, email, phone_number FROM users ORDER BY id DESC";
+
+        try (Connection conn = dbconfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                users.add(user);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting all users: " + e.getMessage());
+        }
+
+        return users;
+    }
+
+    // Delete user by ID
+    public boolean deleteUser(int id) {
+        String query = "DELETE FROM users WHERE id = ?";
+
+        try (Connection conn = dbconfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error deleting user: " + e.getMessage());
+            return false;
+        }
     }
 }

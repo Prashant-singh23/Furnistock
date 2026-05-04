@@ -198,4 +198,44 @@ public class CartDao {
 
         return 0;
     }
+
+    // Get total number of ordered items across all users
+    public int getTotalOrderCount() {
+        String query = "SELECT COUNT(*) as count FROM cart WHERE status = 'ordered'";
+
+        try (Connection conn = dbconfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting total order count: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    // Get total revenue from ordered items
+    public double getTotalRevenue() {
+        String query = "SELECT SUM(f.price * c.quantity) as total FROM cart c " +
+                       "JOIN furniture f ON c.furniture_id = f.id " +
+                       "WHERE c.status = 'ordered'";
+
+        try (Connection conn = dbconfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getDouble("total");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting total revenue: " + e.getMessage());
+        }
+
+        return 0.0;
+    }
 }
