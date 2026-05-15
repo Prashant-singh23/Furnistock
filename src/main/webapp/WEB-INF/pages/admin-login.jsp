@@ -6,21 +6,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login — FurniStock</title>
-    <link rel="stylesheet" type="text/css" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/auth.css">
     <style>
         .admin-badge {
             display: inline-block;
-            background-color: #e74c3c;
+            background-color: var(--gold);
             color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 12px;
             font-weight: 600;
             margin-bottom: 10px;
             text-transform: uppercase;
         }
         .card-header.admin {
-            border-bottom: 3px solid #e74c3c;
+            border-bottom: 3px solid var(--gold);
+        }
+        .credentials-info {
+            background-color: var(--panel-bg);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            border-left: 3px solid var(--gold);
+            color: var(--text-muted);
+        }
+        .credentials-info strong {
+            color: var(--brown-dark);
+        }
+        .credentials-info code {
+            background-color: rgba(184, 130, 42, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--brown-dark);
+            font-weight: 600;
         }
     </style>
 </head>
@@ -30,7 +50,7 @@
 
     <!-- ── Brand ── -->
     <div class="brand">
-        <a href="index.jsp" class="brand-logo">
+        <a href="${pageContext.request.contextPath}/index" class="brand-logo">
             <div class="brand-icon"></div>
             <span class="brand-name">Furni<span>Stock</span></span>
         </a>
@@ -52,13 +72,13 @@
 
             <!-- Error Message -->
             <% if (request.getAttribute("error") != null) { %>
-                <div style="background-color: #fee; color: #c33; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 14px;">
+                <div style="background-color: rgba(192, 57, 43, 0.1); color: var(--error); padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; border-left: 3px solid var(--error);">
                     <%= request.getAttribute("error") %>
                 </div>
             <% } %>
 
             <!-- Admin Login Form -->
-            <form id="adminLoginForm" action="admin-login" method="post" novalidate>
+            <form id="adminLoginForm" action="${pageContext.request.contextPath}/admin-login" method="post" novalidate>
 
                 <!-- Username -->
                 <div class="form-group">
@@ -100,7 +120,7 @@
                 </div>
 
                 <!-- Credentials Info -->
-                <div style="background-color: #f5f5f5; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px; border-left: 3px solid #e74c3c;">
+                <div class="credentials-info">
                     <strong>Demo Credentials:</strong><br>
                     Username: <code>admin</code><br>
                     Password: <code>Admin@123</code>
@@ -115,8 +135,8 @@
 
             <!-- Back to Login -->
             <div style="text-align: center; margin-top: 16px;">
-                <a href="${pageContext.request.contextPath}/login" style="color: #666; text-decoration: none; font-size: 14px;">
-                    ← Back to User Login
+                <a href="${pageContext.request.contextPath}/login" style="color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.25s ease;">
+                    <i class="bi bi-arrow-left"></i> Back to User Login
                 </a>
             </div>
 

@@ -10,22 +10,8 @@
                                 
         
         
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/build/classes"/>
                 
-        <dependent-module archiveName="mysql-connector-j-9.6.0 (1).jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/MY PC/OneDrive/Desktop/mysql-connector-j-9.6.0/mysql-connector-j-9.6.0 (1).jar">
-                        
-            <dependency-type>uses</dependency-type>
-                    
-        </dependent-module>
-                
-        <dependent-module archiveName="jBCrypt-0.4-javadoc (1).jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/MY PC/OneDrive/Desktop/jBCrypt-0.4-javadoc (1).jar">
-                        
-            <dependency-type>uses</dependency-type>
-                    
-        </dependent-module>
-        <dependent-module archiveName="jbcrypt-0.4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/MY PC/Downloads/jbcrypt-0.4.jar">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
                                 
         
         

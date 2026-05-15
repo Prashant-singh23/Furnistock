@@ -4,29 +4,28 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * DBConnection provides the central database connectivity for the application.
- * It uses the MySQL JDBC driver to connect to the 'auth_db' database.
- */
-public class dbconfig {
-    // Database URL, credentials and driver configuration
-    private static final String URL = "jdbc:mysql://localhost:3306/Furnistock?useSSL=false&serverTimezone=UTC";
-    private static final String USER = "root";
-    private static final String PASSWORD = ""; // Please update with your actual password
+public class DBConfig {
+    private static final String URL = getConfig("FURNISTOCK_DB_URL", "db.url", "jdbc:mysql://localhost:3306/furnistock");
+    private static final String USER = getConfig("FURNISTOCK_DB_USER", "db.user", "root");
+    private static final String PASSWORD = getConfig("FURNISTOCK_DB_PASSWORD", "db.password", "");
 
     static {
         try {
-            // Registering the JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException("MySQL JDBC Driver not found", e);
         }
     }
 
-    /**
-     * Establishes and returns a database connection.
-     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+    private static String getConfig(String envName, String propertyName, String defaultValue) {
+        String value = System.getProperty(propertyName);
+        if (value == null || value.isBlank()) {
+            value = System.getenv(envName);
+        }
+        return value == null ? defaultValue : value;
     }
 }

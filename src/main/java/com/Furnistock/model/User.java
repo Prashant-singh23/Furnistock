@@ -67,6 +67,12 @@ public class User {
 	 public void setPhoneNumber(String phoneNumber) {
 		 this.phoneNumber = phoneNumber;
 	 }
+	 public String getPhone() {
+		 return phoneNumber;
+	 }
+	 public void setPhone(String phone) {
+		 this.phoneNumber = phone;
+	 }
 	 public String getPasswordHash() {
 		 return passwordHash;
 	 }

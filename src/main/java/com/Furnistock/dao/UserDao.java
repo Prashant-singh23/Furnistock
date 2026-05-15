@@ -1,6 +1,6 @@
 package com.Furnistock.dao;
 
-import com.Furnistock.config.dbconfig;
+import com.Furnistock.config.DBConfig;
 import com.Furnistock.model.User;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -13,12 +13,12 @@ public class UserDao {
 
     // Register user
     public boolean registerUser(User user) {
-        String query = "INSERT INTO users (first_name, last_name, email, phone_number, password_hash) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)";
 
         // Hash password
         String hashedPassword = BCrypt.hashpw(user.getPasswordHash(), BCrypt.gensalt());
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, user.getFirstName());
@@ -26,6 +26,7 @@ public class UserDao {
             pstmt.setString(3, user.getEmail());
             pstmt.setString(4, user.getPhoneNumber());
             pstmt.setString(5, hashedPassword);
+            pstmt.setString(6, User.ROLE_USER);
 
             return pstmt.executeUpdate() > 0;
 
@@ -37,9 +38,9 @@ public class UserDao {
 
     // Validate user (login using email)
     public User validateUser(String email, String password) {
-        String query = "SELECT * FROM users WHERE email = ?";
+        String query = "SELECT * FROM users WHERE LOWER(email) = LOWER(?)";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, email);
@@ -48,12 +49,20 @@ public class UserDao {
             if (rs.next()) {
                 String storedHash = rs.getString("password_hash");
 
-                // Fallback: If storedHash is not a BCrypt hash, check plain text
-                boolean valid = false;
-                if (storedHash != null && storedHash.startsWith("$2a$") || storedHash.startsWith("$2b$") || storedHash.startsWith("$2y$")) {
-                    valid = org.mindrot.jbcrypt.BCrypt.checkpw(password, storedHash);
+                // Fallback: If storedHash is not a BCrypt hash, check plain text.
+                boolean isBcryptHash = storedHash != null
+                        && (storedHash.startsWith("$2a$")
+                        || storedHash.startsWith("$2b$")
+                        || storedHash.startsWith("$2y$"));
+                boolean valid;
+                if (isBcryptHash) {
+                    try {
+                        valid = BCrypt.checkpw(password, storedHash);
+                    } catch (IllegalArgumentException e) {
+                        valid = false;
+                    }
                 } else {
-                    valid = password.equals(storedHash);
+                    valid = password != null && password.equals(storedHash);
                 }
 
                 if (valid) {
@@ -64,6 +73,8 @@ public class UserDao {
                     user.setEmail(rs.getString("email"));
                     user.setPhoneNumber(rs.getString("phone_number"));
                     user.setPasswordHash(storedHash);
+                    String role = rs.getString("role");
+                    user.setRole(role == null || role.isBlank() ? User.ROLE_USER : role);
                     return user;
                 }
             }
@@ -81,7 +92,7 @@ public class UserDao {
         String adminUsername = "admin";
         String adminPassword = "Admin@123";
 
-        if (username.equals(adminUsername) && password.equals(adminPassword)) {
+        if (adminUsername.equals(username) && adminPassword.equals(password)) {
             User admin = new User();
             admin.setId(0);
             admin.setFirstName("Admin");
@@ -100,7 +111,7 @@ public class UserDao {
     public int getUserCount() {
         String query = "SELECT COUNT(*) as count FROM users";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             ResultSet rs = pstmt.executeQuery();
@@ -120,7 +131,7 @@ public class UserDao {
         List<User> users = new ArrayList<>();
         String query = "SELECT id, first_name, last_name, email, phone_number FROM users ORDER BY id DESC";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             ResultSet rs = pstmt.executeQuery();
@@ -145,7 +156,7 @@ public class UserDao {
     public boolean deleteUser(int id) {
         String query = "DELETE FROM users WHERE id = ?";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, id);
@@ -153,6 +164,51 @@ public class UserDao {
 
         } catch (SQLException e) {
             System.err.println("Error deleting user: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Get user by email
+    public User getUserByEmail(String email) {
+        String query = "SELECT * FROM users WHERE LOWER(email) = LOWER(?)";
+
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhoneNumber(rs.getString("phone_number"));
+                user.setPasswordHash(rs.getString("password_hash"));
+                return user;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting user by email: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    public boolean updatePasswordByEmail(String email, String plainPassword) {
+        String query = "UPDATE users SET password_hash = ? WHERE LOWER(email) = LOWER(?)";
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, hashedPassword);
+            pstmt.setString(2, email);
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error updating password for email: " + e.getMessage());
             return false;
         }
     }

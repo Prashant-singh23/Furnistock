@@ -6,13 +6,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register — FurniStock</title>
-  <link rel="stylesheet" type="text/css" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/auth.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+    
+    :root {
+      --gold: #B8822A;
+      --gold-light: #D4A855;
+      --gold-accent: #E8D5B7;
+      --bg: #F7F2EA;
+      --error: #C0392B;
+      --brown-dark: #2E1B0E;
+      --text-muted: #7A6652;
+      --border: #D9CEBC;
+      --panel-bg: #FDFAF5;
+    }
+  </style>
 </head>
 <body>
 
 <%
     /* ── Server-side: read error/success messages ── */
-    String errorMsg   = (String) session.getAttribute("registerError");
+    String errorMsg   = (String) request.getAttribute("error");
+    if (errorMsg == null) errorMsg = (String) session.getAttribute("registerError");
     String successMsg = (String) session.getAttribute("registerSuccess");
     if (errorMsg   != null) session.removeAttribute("registerError");
     if (successMsg != null) session.removeAttribute("registerSuccess");
@@ -22,7 +39,7 @@
 
     <!-- ── Brand ── -->
     <div class="brand">
-        <a href="index.jsp" class="brand-logo">
+        <a href="${pageContext.request.contextPath}/index" class="brand-logo">
             <div class="brand-icon"></div>
             <span class="brand-name">Furni<span>Stock</span></span>
         </a>
@@ -41,10 +58,20 @@
         <!-- Body -->
         <div class="card-body">
 
-           
+            <% if (errorMsg != null) { %>
+                <div class="alert alert-error" style="margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: rgba(192, 57, 43, 0.1); color: var(--error); font-size: 14px;">
+                    <%= errorMsg %>
+                </div>
+            <% } %>
+
+            <% if (successMsg != null) { %>
+                <div class="alert alert-success" style="margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: #dcfce7; color: #166534; font-size: 14px;">
+                    <%= successMsg %>
+                </div>
+            <% } %>
 
             <!-- Registration Form -->
-            <form id="registerForm" action="register" method="post" novalidate>
+            <form id="registerForm" action="${pageContext.request.contextPath}/register" method="post" novalidate>
 
                 <!-- First Name + Last Name -->
                 <div class="form-row">
@@ -188,6 +215,7 @@
         </button>
     </div>
 </div>
+                    <span class="msg-error" id="confirmErr"></span>
                     
                 <!-- Hidden CSRF token -->
                 <input type="hidden" name="csrf_token" value="<%= session.getAttribute("csrfToken") != null ? session.getAttribute("csrfToken") : "" %>">
@@ -201,7 +229,7 @@
 
             <!-- Footer -->
             <p class="card-footer-text">
-                <a href="login">Sign in to your account →</a>
+                <a href="${pageContext.request.contextPath}/login">Sign in to your account -&gt;</a>
             </p>
 
         </div>
@@ -316,11 +344,6 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         fields.confirmPassword.err.textContent = '✕  Please confirm your password.'; valid = false;
     } else if (fields.password.el.value !== fields.confirmPassword.el.value) {
         fields.confirmPassword.err.textContent = '✕  Passwords do not match.'; valid = false;
-    }
-
-    if (!document.getElementById('terms').checked) {
-        alert('Please accept the Terms & Conditions to continue.');
-        valid = false;
     }
 
     if (!valid) e.preventDefault();

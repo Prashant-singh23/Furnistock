@@ -1,6 +1,6 @@
 package com.Furnistock.dao;
 
-import com.Furnistock.config.dbconfig;
+import com.Furnistock.config.DBConfig;
 import com.Furnistock.model.Furniture;
 
 import java.sql.*;
@@ -13,7 +13,7 @@ public class FurnitureDao {
     public boolean addFurniture(Furniture furniture) {
         String query = "INSERT INTO furniture (name, description, category, price, stock, image_url) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, furniture.getName());
@@ -32,11 +32,11 @@ public class FurnitureDao {
     }
 
     // Read all furniture items
-    public List<Furniture> getAllFurniture() {
+    public List<Furniture> getAllFurniture(String sortOption) {
         List<Furniture> furnitureList = new ArrayList<>();
-        String query = "SELECT * FROM furniture ORDER BY id DESC";
+        String query = "SELECT * FROM furniture ORDER BY " + getSortClause(sortOption);
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
@@ -61,11 +61,47 @@ public class FurnitureDao {
         return furnitureList;
     }
 
+    public List<Furniture> getAllFurniture() {
+        return getAllFurniture(null);
+    }
+
+    public int getFurnitureCount() {
+        String query = "SELECT COUNT(*) as count FROM furniture";
+
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error getting furniture count: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    private String getSortClause(String sortOption) {
+        if (sortOption == null) {
+            return "id DESC";
+        }
+
+        return switch (sortOption) {
+            case "price_asc" -> "price ASC";
+            case "price_desc" -> "price DESC";
+            case "name_asc" -> "name ASC";
+            case "name_desc" -> "name DESC";
+            default -> "id DESC";
+        };
+    }
+
     // Read furniture by ID
     public Furniture getFurnitureById(int id) {
         String query = "SELECT * FROM furniture WHERE id = ?";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, id);
@@ -96,7 +132,7 @@ public class FurnitureDao {
     public boolean updateFurniture(Furniture furniture) {
         String query = "UPDATE furniture SET name = ?, description = ?, category = ?, price = ?, stock = ?, image_url = ? WHERE id = ?";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, furniture.getName());
@@ -119,7 +155,7 @@ public class FurnitureDao {
     public boolean deleteFurniture(int id) {
         String query = "DELETE FROM furniture WHERE id = ?";
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setInt(1, id);
@@ -132,11 +168,11 @@ public class FurnitureDao {
     }
 
     // Search furniture by category
-    public List<Furniture> getFurnitureByCategory(String category) {
+    public List<Furniture> getFurnitureByCategory(String category, String sortOption) {
         List<Furniture> furnitureList = new ArrayList<>();
-        String query = "SELECT * FROM furniture WHERE category = ? ORDER BY id DESC";
+        String query = "SELECT * FROM furniture WHERE category = ? ORDER BY " + getSortClause(sortOption);
 
-        try (Connection conn = dbconfig.getConnection();
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             pstmt.setString(1, category);
@@ -163,12 +199,16 @@ public class FurnitureDao {
         return furnitureList;
     }
 
-    // Search furniture by name
-    public List<Furniture> searchFurniture(String searchTerm) {
-        List<Furniture> furnitureList = new ArrayList<>();
-        String query = "SELECT * FROM furniture WHERE name LIKE ? OR description LIKE ? ORDER BY id DESC";
+    public List<Furniture> getFurnitureByCategory(String category) {
+        return getFurnitureByCategory(category, null);
+    }
 
-        try (Connection conn = dbconfig.getConnection();
+    // Search furniture by name
+    public List<Furniture> searchFurniture(String searchTerm, String sortOption) {
+        List<Furniture> furnitureList = new ArrayList<>();
+        String query = "SELECT * FROM furniture WHERE name LIKE ? OR description LIKE ? ORDER BY " + getSortClause(sortOption);
+
+        try (Connection conn = DBConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             String term = "%" + searchTerm + "%";
@@ -195,5 +235,9 @@ public class FurnitureDao {
         }
 
         return furnitureList;
+    }
+
+    public List<Furniture> searchFurniture(String searchTerm) {
+        return searchFurniture(searchTerm, null);
     }
 }

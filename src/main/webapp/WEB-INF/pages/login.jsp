@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — FurniStock</title>
-    <link rel="stylesheet" type="text/css" href="css/auth.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/auth.css">
 </head>
 <body>
 
@@ -16,7 +16,7 @@
 
     <!-- ── Brand ── -->
     <div class="brand">
-        <a href="index.jsp" class="brand-logo">
+        <a href="${pageContext.request.contextPath}/index" class="brand-logo">
             <div class="brand-icon"></div>
             <span class="brand-name">Furni<span>Stock</span></span>
         </a>
@@ -35,10 +35,32 @@
         <!-- Body -->
         <div class="card-body">
 
-           
+            <%
+                String successMsg = (String) session.getAttribute("registerSuccess");
+                if (successMsg != null) {
+                    session.removeAttribute("registerSuccess");
+            %>
+                <div class="alert alert-success" style="margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: #dcfce7; color: #166534; font-size: 14px;">
+                    <%= successMsg %>
+                </div>
+            <% }
+                String resetSuccess = (String) session.getAttribute("success");
+                if (resetSuccess != null) {
+                    session.removeAttribute("success");
+            %>
+                <div class="alert alert-success" style="margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: #dcfce7; color: #166534; font-size: 14px;">
+                    <%= resetSuccess %>
+                </div>
+            <% } %>
+
+            <% if (request.getAttribute("error") != null) { %>
+                <div class="alert alert-error" style="margin-bottom: 18px; padding: 12px 14px; border-radius: 8px; background: #fee2e2; color: #991b1b; font-size: 14px;">
+                    <%= request.getAttribute("error") %>
+                </div>
+            <% } %>
 
             <!-- Login Form -->
-            <form id="loginForm" action="login" method="post" novalidate>
+            <form id="loginForm" action="${pageContext.request.contextPath}/login" method="post" novalidate>
 
                 <!-- Email -->
                 <div class="form-group">
@@ -85,8 +107,9 @@
                         <input type="checkbox" id="remember" name="remember" value="true">
                         <label for="remember" style="margin-bottom:0; font-size:12.5px;">Remember me</label>
                     </div>
-                    <a href="ForgotPassword.jsp" class="forgot-link" style="margin:0;">Forgot password?</a>
+                    <a href="${pageContext.request.contextPath}/forgot-password" style="font-size:12.5px; color:#007bff; text-decoration:none;">Forgot password?</a>
                 </div>
+
 
                 <!-- Hidden CSRF token (implement on server side) -->
                 <input type="hidden" name="csrf_token" value="<%= session.getAttribute("csrfToken") != null ? session.getAttribute("csrfToken") : "" %>">
@@ -101,14 +124,14 @@
             <!-- Footer -->
             <p class="card-footer-text">
                 Don't have an account?&nbsp;
-                <a href="Register">Create one — it's free</a>
+                <a href="${pageContext.request.contextPath}/register">Create one - it's free</a>
             </p>
 
             <!-- Admin Login Link -->
             <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #eee;">
                 <p style="font-size: 12px; color: #999; margin-bottom: 8px;">Are you an admin?</p>
                 <a href="${pageContext.request.contextPath}/admin-login" style="color: #e74c3c; text-decoration: none; font-weight: 600;">
-                    Go to Admin Login →
+                    Go to Admin Login <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
 

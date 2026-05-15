@@ -14,7 +14,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Customers — FurniStock Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg:         #F7F2EA;
+            --panel-bg:   #FDFAF5;
+            --brown-dark: #2E1B0E;
+            --brown-mid:  #5C3D2E;
+            --gold:       #B8822A;
+            --gold-light: #D4A855;
+            --cream:      #EDE5D4;
+            --text:       #1C1208;
+            --text-muted: #7A6652;
+            --border:     #D9CEBC;
+            --error:      #C0392B;
+            --success:    #27AE60;
+            --shadow-sm:  0 4px 16px rgba(46, 27, 14, 0.08);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -22,8 +41,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fa;
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
             padding: 20px;
         }
 
@@ -37,15 +56,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .header h1 {
-            color: #333;
-            font-size: 24px;
+            font-family: 'Playfair Display', serif;
+            color: var(--brown-dark);
+            font-size: 28px;
+            font-weight: 700;
         }
 
         .header-actions {
@@ -65,72 +86,76 @@
         }
 
         .btn-primary {
-            background-color: #667eea;
+            background-color: var(--gold);
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: #5568d3;
+            background-color: var(--gold-light);
         }
 
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: var(--text-muted);
             color: white;
         }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background-color: var(--brown-dark);
         }
 
         .btn-danger {
-            background-color: #e74c3c;
+            background-color: var(--error);
             color: white;
         }
 
         .btn-danger:hover {
-            background-color: #c0392b;
+            background-color: #9c3a2f;
         }
 
         .success-msg {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 6px;
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            border-left: 3px solid var(--success);
         }
 
         .error-msg {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 6px;
+            background-color: rgba(192, 57, 43, 0.1);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            border-left: 3px solid var(--error);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            background: var(--panel-bg);
+            border-radius: 12px;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         th {
-            background-color: #667eea;
+            background-color: var(--brown-dark);
             color: white;
-            padding: 15px;
+            padding: 16px;
             text-align: left;
             font-weight: 600;
+            font-size: 14px;
         }
 
         td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
         }
 
         tr:hover {
-            background-color: #f9f9f9;
+            background-color: var(--cream);
         }
 
         .table-actions {
@@ -149,62 +174,66 @@
         }
 
         .action-view {
-            background-color: #3498db;
+            background-color: var(--gold);
         }
 
         .action-view:hover {
-            background-color: #2980b9;
+            background-color: var(--gold-light);
         }
 
         .action-delete {
-            background-color: #e74c3c;
+            background-color: var(--error);
         }
 
         .action-delete:hover {
-            background-color: #c0392b;
+            background-color: #9c3a2f;
         }
 
         .no-data {
             text-align: center;
             padding: 40px;
-            color: #999;
-            background: white;
-            border-radius: 8px;
+            color: var(--text-muted);
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 1rem 2rem;
+            background-color: var(--panel-bg);
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
             margin-bottom: 20px;
             border-radius: 0;
         }
 
         .nav-brand {
+            font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--brown-dark);
         }
 
         .nav-brand span {
-            color: #667eea;
+            color: var(--gold);
         }
 
         .nav-right {
             display: flex;
-            gap: 1rem;
+            gap: 2rem;
         }
 
         .back-link {
-            color: white;
+            color: var(--text-muted);
             text-decoration: none;
+            transition: color 0.25s ease;
         }
 
         .back-link:hover {
-            color: #667eea;
+            color: var(--gold);
         }
     </style>
 </head>
@@ -214,7 +243,7 @@
 <div class="navbar">
     <div class="nav-brand">Furni<span>Stock</span> - Customer Manager</div>
     <div class="nav-right">
-        <a href="${pageContext.request.contextPath}/admin" class="back-link">← Back to Dashboard</a>
+        <a href="${pageContext.request.contextPath}/admin" class="back-link"><i class="bi bi-arrow-left"></i> Back to Dashboard</a>
         <a href="${pageContext.request.contextPath}/logout" class="back-link">Logout</a>
     </div>
 </div>
@@ -222,7 +251,7 @@
 <div class="container">
     <!-- Header -->
     <div class="header">
-        <h1>👥 Manage Customers</h1>
+        <h1><i class="bi bi-people"></i> Manage Customers</h1>
         <div class="header-actions">
             <span style="color: #666; font-size: 14px;">Total Customers: <%= request.getAttribute("customerList") != null ? ((List<User>) request.getAttribute("customerList")).size() : 0 %></span>
         </div>
@@ -230,7 +259,7 @@
 
     <!-- Success/Error Messages -->
     <% if (request.getParameter("deleted") != null) { %>
-        <div class="success-msg">✓ Customer deleted successfully!</div>
+        <div class="success-msg"><i class="bi bi-check-circle"></i> Customer deleted successfully!</div>
     <% } %>
     <% if (request.getParameter("error") != null) { %>
         <div class="error-msg">✗ Error: <%= request.getParameter("error").equals("invalid_id") ? "Invalid customer ID" : request.getParameter("error").equals("delete_failed") ? "Failed to delete customer" : "Missing customer ID" %></div>

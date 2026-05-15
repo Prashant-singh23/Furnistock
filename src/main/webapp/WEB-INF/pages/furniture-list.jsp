@@ -4,7 +4,14 @@
 <%@ page import="com.Furnistock.model.User" %>
 <%
     User user = (User) session.getAttribute("user");
-    if (user == null || !"admin".equals(user.getRole())) {
+    if (user == null || user.getRole() == null || !"admin".equalsIgnoreCase(user.getRole())) {
+%>
+    <div style="padding:20px;background:#fee;border:1px solid #f99;">
+        Admin check failed.<br/>
+        user is null? <%= (user == null) %><br/>
+        role = <%= (user == null ? "null" : user.getRole()) %>
+    </div>
+<%
         response.sendRedirect(request.getContextPath() + "/admin-login");
         return;
     }
@@ -15,7 +22,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Furniture — FurniStock Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg:         #F7F2EA;
+            --panel-bg:   #FDFAF5;
+            --brown-dark: #2E1B0E;
+            --brown-mid:  #5C3D2E;
+            --gold:       #B8822A;
+            --gold-light: #D4A855;
+            --cream:      #EDE5D4;
+            --text:       #1C1208;
+            --text-muted: #7A6652;
+            --border:     #D9CEBC;
+            --error:      #C0392B;
+            --success:    #27AE60;
+            --shadow-sm:  0 4px 16px rgba(46, 27, 14, 0.08);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -23,8 +49,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fa;
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
             padding: 20px;
         }
 
@@ -38,15 +64,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .header h1 {
-            color: #333;
-            font-size: 24px;
+            font-family: 'Playfair Display', serif;
+            color: var(--brown-dark);
+            font-size: 28px;
+            font-weight: 700;
         }
 
         .header-actions {
@@ -66,110 +94,116 @@
         }
 
         .btn-primary {
-            background-color: #667eea;
+            background-color: var(--gold);
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: #5568d3;
+            background-color: var(--gold-light);
         }
 
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: var(--text-muted);
             color: white;
         }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background-color: var(--brown-dark);
         }
 
         .btn-danger {
-            background-color: #e74c3c;
+            background-color: var(--error);
             color: white;
         }
 
         .btn-danger:hover {
-            background-color: #c0392b;
+            background-color: #9c3a2f;
         }
 
         .btn-edit {
-            background-color: #3498db;
+            background-color: var(--gold);
             color: white;
             padding: 6px 12px;
             font-size: 12px;
         }
 
         .btn-edit:hover {
-            background-color: #2980b9;
+            background-color: var(--gold-light);
         }
 
         .search-box {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
-            background: white;
+            background: var(--panel-bg);
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .search-box input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             font-size: 14px;
+            font-family: 'Jost', sans-serif;
         }
 
         .search-box button {
             padding: 10px 20px;
-            background-color: #667eea;
+            background-color: var(--gold);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
         }
 
         .success-msg {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 6px;
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            border-left: 3px solid var(--success);
         }
 
         .error-msg {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 6px;
+            background-color: rgba(192, 57, 43, 0.1);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            border-left: 3px solid var(--error);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            background: var(--panel-bg);
+            border-radius: 12px;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         th {
-            background-color: #667eea;
+            background-color: var(--brown-dark);
             color: white;
-            padding: 15px;
+            padding: 16px;
             text-align: left;
             font-weight: 600;
+            font-size: 14px;
         }
 
         td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
         }
 
         tr:hover {
-            background-color: #f9f9f9;
+            background-color: var(--cream);
         }
 
         .table-actions {
@@ -188,27 +222,28 @@
         }
 
         .action-edit {
-            background-color: #3498db;
+            background-color: var(--gold);
         }
 
         .action-edit:hover {
-            background-color: #2980b9;
+            background-color: var(--gold-light);
         }
 
         .action-delete {
-            background-color: #e74c3c;
+            background-color: var(--error);
         }
 
         .action-delete:hover {
-            background-color: #c0392b;
+            background-color: #9c3a2f;
         }
 
         .no-data {
             text-align: center;
             padding: 40px;
-            color: #999;
-            background: white;
-            border-radius: 8px;
+            color: var(--text-muted);
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .modal {
@@ -223,18 +258,19 @@
         }
 
         .modal-content {
-            background-color: white;
+            background-color: var(--panel-bg);
             margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
+            padding: 30px;
+            border: 1px solid var(--border);
             width: 400px;
-            border-radius: 8px;
+            border-radius: 12px;
         }
 
         .modal-header {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 20px;
+            color: var(--brown-dark);
         }
 
         .modal-buttons {
@@ -245,70 +281,174 @@
         }
 
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 1rem 2rem;
+            background-color: var(--panel-bg);
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
             margin-bottom: 20px;
             border-radius: 0;
         }
 
         .nav-brand {
+            font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--brown-dark);
         }
 
         .nav-brand span {
-            color: #667eea;
+            color: var(--gold);
         }
 
         .nav-right {
             display: flex;
-            gap: 1rem;
+            gap: 2rem;
         }
 
         .back-link {
-            color: white;
+            color: var(--text-muted);
             text-decoration: none;
+            transition: color 0.25s ease;
         }
 
         .back-link:hover {
-            color: #667eea;
+            color: var(--gold);
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            min-height: calc(100vh - 40px);
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            padding: 30px;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gold);
+        }
+
+        .sidebar-brand .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+        }
+
+        .sidebar-brand .brand-name span {
+            color: var(--gold);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: var(--cream);
+            color: var(--brown-dark);
+        }
+
+        .nav-item.active {
+            background-color: var(--brown-dark);
+            color: white;
+            border-left-color: var(--gold);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 24px;
+        }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--gold);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<div class="navbar">
-    <div class="nav-brand">Furni<span>Stock</span> - Furniture Manager</div>
-    <div class="nav-right">
-        <a href="${pageContext.request.contextPath}/admin" class="back-link">← Back to Dashboard</a>
-        <a href="${pageContext.request.contextPath}/logout" class="back-link">Logout</a>
-    </div>
-</div>
-
-<div class="container">
+<div class="main-wrapper">
+    <jsp:include page="admin-sidebar.jsp" />
+    <main class="main-content">
+        <div class="container">
     <!-- Header -->
     <div class="header">
-        <h1>📦 Manage Furniture</h1>
+        <h1><i class="bi bi-box"></i> Manage Furniture</h1>
         <div class="header-actions">
             <a href="${pageContext.request.contextPath}/furniture-add" class="btn btn-primary">+ Add New Item</a>
         </div>
     </div>
 
-    <!-- Success Message -->
+    <!-- Success / Error Messages -->
     <% if (request.getParameter("success") != null) { %>
-        <div class="success-msg">✓ Operation completed successfully!</div>
+        <div class="success-msg"><i class="bi bi-check-circle"></i> Operation completed successfully!</div>
+    <% } %>
+    <% if (request.getAttribute("error") != null) { %>
+        <div class="error-msg"><i class="bi bi-exclamation-circle"></i> <%= request.getAttribute("error") %></div>
     <% } %>
 
     <!-- Search Box -->
     <div class="search-box">
-        <form style="display: flex; gap: 10px; width: 100%;" action="${pageContext.request.contextPath}/furniture-search" method="get">
-            <input type="text" name="search" placeholder="Search by name or description..." value="<%= request.getAttribute("searchTerm") != null ? request.getAttribute("searchTerm") : "" %>">
+        <form style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;" action="${pageContext.request.contextPath}/furniture-search" method="get">
+            <input type="text" name="search" placeholder="Search by name or description..." value="<%= request.getAttribute("searchTerm") != null ? request.getAttribute("searchTerm") : "" %>" style="flex: 2; min-width: 220px;">
+            <select name="sort" style="flex: 1; min-width: 180px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; background: white; color: #1C1208;">
+                <option value="" <%= request.getAttribute("sortOption") == null || "".equals(request.getAttribute("sortOption")) ? "selected" : "" %>>Sort: Newest</option>
+                <option value="price_asc" <%= "price_asc".equals(request.getAttribute("sortOption")) ? "selected" : "" %>>Price: Low to High</option>
+                <option value="price_desc" <%= "price_desc".equals(request.getAttribute("sortOption")) ? "selected" : "" %>>Price: High to Low</option>
+                <option value="name_asc" <%= "name_asc".equals(request.getAttribute("sortOption")) ? "selected" : "" %>>Name: A to Z</option>
+                <option value="name_desc" <%= "name_desc".equals(request.getAttribute("sortOption")) ? "selected" : "" %>>Name: Z to A</option>
+            </select>
             <button type="submit">Search</button>
             <a href="${pageContext.request.contextPath}/furniture-list" class="btn btn-secondary">Clear</a>
         </form>
@@ -337,9 +477,13 @@
                 <td><%= furniture.getId() %></td>
                 <td><strong><%= furniture.getName() %></strong></td>
                 <td><%= furniture.getCategory() %></td>
-                <td>$<%= String.format("%.2f", furniture.getPrice()) %></td>
+                <td>NPR <%= String.format("%.2f", furniture.getPrice()) %></td>
                 <td><%= furniture.getStock() %></td>
-                <td><%= furniture.getDescription().length() > 50 ? furniture.getDescription().substring(0, 50) + "..." : furniture.getDescription() %></td>
+                <%
+                    String description = furniture.getDescription() != null ? furniture.getDescription() : "";
+                    String shortDescription = description.length() > 50 ? description.substring(0, 50) + "..." : description;
+                %>
+                <td><%= shortDescription %></td>
                 <td>
                     <div class="table-actions">
                         <a href="${pageContext.request.contextPath}/furniture-edit?id=<%= furniture.getId() %>" class="action-link action-edit">Edit</a>
@@ -359,6 +503,7 @@
     </div>
     <% } %>
 </div>
-
+    </main>
+</div>
 </body>
 </html>

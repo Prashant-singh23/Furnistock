@@ -247,18 +247,40 @@ a {
 /* ── Hero Visual ── */
 .hero-visual {
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image-stack {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 24px;
+    width: 100%;
+    max-width: 900px;
 }
 
 .hero-image-container {
     position: relative;
+    width: 100%;
+    min-height: 620px;
+    overflow: hidden;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+}
+
+.hero-image-secondary {
+    min-height: 560px;
+    align-self: end;
 }
 
 .hero-image {
     width: 100%;
-    height: 500px;
+    height: 100%;
     object-fit: cover;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
+    object-position: top center;
+    border-radius: 30px;
+    display: block;
 }
 
 .floating-card {

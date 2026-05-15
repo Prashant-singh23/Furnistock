@@ -20,7 +20,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Furniture — FurniStock Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg:         #F7F2EA;
+            --panel-bg:   #FDFAF5;
+            --brown-dark: #2E1B0E;
+            --brown-mid:  #5C3D2E;
+            --gold:       #B8822A;
+            --gold-light: #D4A855;
+            --cream:      #EDE5D4;
+            --text:       #1C1208;
+            --text-muted: #7A6652;
+            --border:     #D9CEBC;
+            --error:      #C0392B;
+            --shadow-sm:  0 4px 16px rgba(46, 27, 14, 0.08);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -28,8 +46,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #f5f7fa;
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
             padding: 20px;
         }
 
@@ -39,64 +57,166 @@
         }
 
         .navbar {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 1rem 2rem;
+            background-color: var(--panel-bg);
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
             margin-bottom: 20px;
             border-radius: 0;
         }
 
         .nav-brand {
+            font-family: 'Playfair Display', serif;
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 600;
+            color: var(--brown-dark);
         }
 
         .nav-brand span {
-            color: #667eea;
+            color: var(--gold);
         }
 
         .nav-right {
             display: flex;
-            gap: 1rem;
+            gap: 2rem;
         }
 
         .back-link {
-            color: white;
+            color: var(--text-muted);
             text-decoration: none;
+            transition: color 0.25s ease;
         }
 
         .back-link:hover {
-            color: #667eea;
+            color: var(--gold);
+        }
+
+        .main-wrapper {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            min-height: calc(100vh - 40px);
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            padding: 30px;
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gold);
+        }
+
+        .sidebar-brand .brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+        }
+
+        .sidebar-brand .brand-name span {
+            color: var(--gold);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: var(--cream);
+            color: var(--brown-dark);
+        }
+
+        .nav-item.active {
+            background-color: var(--brown-dark);
+            color: white;
+            border-left-color: var(--gold);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 24px;
+        }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--gold);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
         }
 
         .header {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
         }
 
         .header h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
+            color: var(--brown-dark);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
         .header p {
-            color: #666;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 15px;
         }
 
         .form-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .form-group {
@@ -106,24 +226,25 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
+            color: var(--brown-dark);
+            font-weight: 600;
             font-size: 14px;
         }
 
         input, textarea, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             font-size: 14px;
-            font-family: inherit;
+            font-family: 'Jost', sans-serif;
+            color: var(--text);
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(184, 130, 42, 0.1);
         }
 
         textarea {
@@ -138,11 +259,12 @@
         }
 
         .error-msg {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 6px;
+            background-color: rgba(192, 57, 43, 0.1);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            border-left: 3px solid var(--error);
         }
 
         .form-buttons {
@@ -163,16 +285,16 @@
         }
 
         .btn-submit {
-            background-color: #667eea;
+            background-color: var(--gold);
             color: white;
         }
 
         .btn-submit:hover {
-            background-color: #5568d3;
+            background-color: var(--gold-light);
         }
 
         .btn-cancel {
-            background-color: #6c757d;
+            background-color: var(--text-muted);
             color: white;
             text-decoration: none;
             display: flex;
@@ -181,46 +303,40 @@
         }
 
         .btn-cancel:hover {
-            background-color: #5a6268;
+            background-color: var(--brown-dark);
+        }
+
+        .item-id {
+            background-color: var(--cream);
+            color: var(--text-muted);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 5px;
         }
 
         .help-text {
             font-size: 12px;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        .item-id {
-            background-color: #f5f5f5;
-            color: #666;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
+            color: var(--text-muted);
             margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<div class="navbar">
-    <div class="nav-brand">Furni<span>Stock</span> - Furniture Manager</div>
-    <div class="nav-right">
-        <a href="${pageContext.request.contextPath}/furniture-list" class="back-link">← Back to List</a>
-        <a href="${pageContext.request.contextPath}/logout" class="back-link">Logout</a>
-    </div>
-</div>
-
-<div class="container">
+<div class="main-wrapper">
+    <jsp:include page="admin-sidebar.jsp" />
+    <main class="main-content">
+        <div class="container">
     <!-- Header -->
     <div class="header">
-        <h1>✏️ Edit Furniture Item</h1>
+        <h1><i class="bi bi-pencil"></i> Edit Furniture Item</h1>
         <p>Update the details of the furniture item below</p>
     </div>
 
     <!-- Error Message -->
     <% if (request.getAttribute("error") != null) { %>
-        <div class="error-msg">⚠️ <%= request.getAttribute("error") %></div>
+        <div class="error-msg"><i class="bi bi-exclamation-triangle"></i> <%= request.getAttribute("error") %></div>
     <% } %>
 
     <!-- Edit Furniture Form -->
@@ -253,7 +369,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="price">Price ($) *</label>
+                    <label for="price">Price (NPR) *</label>
                     <input type="number" id="price" name="price" placeholder="0.00" step="0.01" min="0" value="<%= furniture.getPrice() %>" required>
                 </div>
             </div>
@@ -285,11 +401,13 @@
 
             <!-- Buttons -->
             <div class="form-buttons">
-                <button type="submit" class="btn btn-submit">✓ Update Item</button>
+                <button type="submit" class="btn btn-submit"><i class="bi bi-check-circle"></i> Update Item</button>
                 <a href="${pageContext.request.contextPath}/furniture-list" class="btn btn-cancel">Cancel</a>
             </div>
         </form>
     </div>
+    </div>
+    </main>
 </div>
 
 </body>

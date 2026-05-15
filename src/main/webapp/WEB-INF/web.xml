@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0"
+         metadata-complete="true">
+
+    <servlet>
+        <servlet-name>HomeController</servlet-name>
+        <servlet-class>com.Furnistock.controller.HomeController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AuthController</servlet-name>
+        <servlet-class>com.Furnistock.controller.AuthController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FurnitureController</servlet-name>
+        <servlet-class>com.Furnistock.controller.FurnitureController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserController</servlet-name>
+        <servlet-class>com.Furnistock.controller.UserController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserShopController</servlet-name>
+        <servlet-class>com.Furnistock.controller.UserShopController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HomeController</servlet-name>
+        <url-pattern>/index</url-pattern>
+        <url-pattern>/home</url-pattern>
+        <url-pattern>/about</url-pattern>
+        <url-pattern>/contact</url-pattern>
+        <url-pattern>/admin</url-pattern>
+        <url-pattern>/admin-report</url-pattern>
+        <url-pattern>/admin-settings</url-pattern>
+        <url-pattern>/admin-support</url-pattern>
+        <url-pattern>/admin-feedback</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AuthController</servlet-name>
+        <url-pattern>/login</url-pattern>
+        <url-pattern>/register</url-pattern>
+        <url-pattern>/admin-login</url-pattern>
+        <url-pattern>/forgot-password</url-pattern>
+        <url-pattern>/reset-password</url-pattern>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>FurnitureController</servlet-name>
+        <url-pattern>/furniture</url-pattern>
+        <url-pattern>/furniture-list</url-pattern>
+        <url-pattern>/furniture-add</url-pattern>
+        <url-pattern>/furniture-edit</url-pattern>
+        <url-pattern>/furniture-delete</url-pattern>
+        <url-pattern>/furniture-search</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>UserController</servlet-name>
+        <url-pattern>/customer-list</url-pattern>
+        <url-pattern>/customer-delete</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>UserShopController</servlet-name>
+        <url-pattern>/shop</url-pattern>
+        <url-pattern>/cart</url-pattern>
+        <url-pattern>/add-to-cart</url-pattern>
+        <url-pattern>/remove-from-cart</url-pattern>
+        <url-pattern>/checkout</url-pattern>
+        <url-pattern>/orders</url-pattern>
+        <url-pattern>/report</url-pattern>
+        <url-pattern>/settings</url-pattern>
+        <url-pattern>/support</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index</welcome-file>
+    </welcome-file-list>
+
+</web-app>
